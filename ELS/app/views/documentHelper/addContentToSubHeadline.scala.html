@@ -1,0 +1,189 @@
+@(subHeadline: ContentSubHeadline)(contentToSubHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])
+
+<!-- <a data-toggle="collapse" href="#subHeadlineAddContent@subHeadline.getcSubHeadLineID()" onclick="setRadioButtonDefault('subHeadlineRadio@(subHeadline.getcSubHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+    <span data-toggle="tooltip" title="Add new Content to this SubHeadline" class="glyphicon glyphicon-plus"></span>
+</a> -->
+
+<div class="collapse" id="subHeadlineAddContent@subHeadline.getcSubHeadLineID()">
+<div class="newContent">
+
+    <h4>Add new Content</h4>
+
+    <div class="form-group">
+        <label >Choose your content type </label></br>
+
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="subHeadlineRadio@(subHeadline.getcSubHeadLineID)_1" value="text" onChange="setTypeOfContentToAddVisible(this, 'SubHeadline@subHeadline.getcSubHeadLineID');"> Text
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="subHeadlineRadio@(subHeadline.getcSubHeadLineID)_2" value="image" onChange="setTypeOfContentToAddVisible(this, 'SubHeadline@subHeadline.getcSubHeadLineID');"> Image
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="subHeadlineRadio@(subHeadline.getcSubHeadLineID)_3" value="code" onChange="setTypeOfContentToAddVisible(this, 'SubHeadline@subHeadline.getcSubHeadLineID');"> Code
+        </label>
+    </div>
+
+
+    <div id="contentText_forSubHeadline@subHeadline.getcSubHeadLineID">
+        <form method="post" action="@routes.ContentController.addContentToContentSubHeadline(subHeadline.getcSubHeadLineID)">
+
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="0" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToSubHeadlines.get(subHeadline.getcSubHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToSubHeadlines.get(subHeadline.getcSubHeadLineID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputText"></label>
+                <textarea name="content" class="editTextArea" id="inputText" rows="6" cols="96"></textarea>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    <div id="contentImage_forSubHeadline@subHeadline.getcSubHeadLineID" hidden="hidden">
+        <form method="POST" action="@routes.ContentController.addContentToContentSubHeadline(subHeadline.getcSubHeadLineID)" enctype="multipart/form-data" onsubmit="return Validate(this, 'warning_SubHeadline@(subHeadline.getcSubHeadLineID)');">
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="1" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToSubHeadlines.get(subHeadline.getcSubHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToSubHeadlines.get(subHeadline.getcSubHeadLineID).size)" selected>at the end</option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpdload">Choose your file</label>
+                <input id="fileUpdload" type="file" name="picture" required>
+                <div id="warning_SubHeadline@(subHeadline.getcSubHeadLineID)"></div>
+            </div>
+
+
+            <input type="submit" value="Ok" class="btn btn-primary">
+
+        </form>
+    </div>
+
+    <div id="contentCode_forSubHeadline@subHeadline.getcSubHeadLineID" hidden="hidden">
+
+        <form method="post" action="@routes.ContentController.addContentToContentSubHeadline(subHeadline.getcSubHeadLineID)" enctype="application/x-www-form-urlencoded"  >
+
+            <!-- <div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div> -->
+
+            <input name="type" value="2" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToSubHeadlines.get(subHeadline.getcSubHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToSubHeadlines.get(subHeadline.getcSubHeadLineID).size)" selected>at the end</option> <br/>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="mode_SubHeadline@(subHeadline.getcSubHeadLineID)">Select Language</label>
+                <select id="mode_SubHeadline@(subHeadline.getcSubHeadLineID)" class="form-control" onchange="updateLanguageOfCodeEditor('SubHeadline@subHeadline.getcSubHeadLineID');">
+                    <option value="java">Java</option>
+                    <option value="javascript" selected>Javascript</option>
+                    <option value="haskell">Haskell</option>
+                </select>
+
+                <textarea name="content" id="inputCode_SubHeadline@(subHeadline.getcSubHeadLineID)" hidden></textarea>
+
+                <div id="editor_SubHeadline@(subHeadline.getcSubHeadLineID)" class="editor"></div>
+
+            </div>
+
+            <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode('SubHeadline@subHeadline.getcSubHeadLineID');">
+
+        </form>
+
+
+        <script>
+        var editor = ace.edit("editor_SubHeadline@(subHeadline.getcSubHeadLineID)");
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/java");
+        updateLanguageOfCodeEditor('SubHeadline@subHeadline.getcSubHeadLineID');
+        </script>
+
+
+    </div>
+
+</div>
+</div>
+
+
+
+
+

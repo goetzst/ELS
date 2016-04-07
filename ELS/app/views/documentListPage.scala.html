@@ -1,0 +1,80 @@
+@(documents: java.util.List[Document])(faculties: java.util.List[Faculty])(subjects: java.util.List[Subject])(bookmarkedDocs: java.util.List[Integer])(email: String)(role: Integer)
+
+@mainFrame("Documents")(email)(role) {
+
+    @mainPageNavigation("allDocuments")
+
+    <h2>List of all Documents</h2>
+
+    @for(fac: Faculty <- faculties) {
+        <div class="list-group">
+            <a href="#" class="list-group-item active">@fac.getFacultyName</a>
+
+            @for(sub: Subject <- subjects) {
+                @if(sub.getFacultyName==fac.getFacultyName) {
+                    <a data-toggle="collapse" data-target="#sub@sub.getSubjectID" class="list-group-item cursorPointer">
+                        <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>     @sub.getSubjectName
+                    </a>
+
+                    <div class="collapse" id="sub@sub.getSubjectID">
+                        @for(doc: Document <- documents) {
+
+                                @if(sub.getSubjectID==doc.getSubjectID) {
+                                    <div class="list-group-item" id="docForSub@sub.getSubjectID" >
+                                        <a href="@routes.DocumentControllerSama.documentPage(doc.getDocumentID, false)" style="color: #555555;" class="cursorPointer">
+                                            <span class="glyphicon glyphicon-file" aria-hidden="true" style="margin-left: 20px; color: #555555;"></span>
+                                             @doc.getDocumentName
+                                        </a>
+
+                                        @if(bookmarkedDocs.isEmpty){
+                                            <a href="@routes.DocumentControllerSama.bookmarkDocument(doc.getDocumentID)" data-toggle="tooltip" data-placement="left" title="Bookmark Document">
+                                                <span class="glyphicon glyphicon-star" style="color: #555555"></span>
+                                            </a>
+                                        }else {
+                                            @if(bookmarkedDocs.contains(doc.getDocumentID)) {
+                                                <a href="@routes.DocumentControllerSama.deleteBookmark(doc.getDocumentID)" data-toggle="tooltip" data-placement="left" title="Delete Bookmark">
+                                                    <span class="glyphicon glyphicon-star" style="color : #FACC2E"></span>
+                                                </a>
+                                            }else{
+                                                <a href="@routes.DocumentControllerSama.bookmarkDocument(doc.getDocumentID)" data-toggle="tooltip" data-placement="left" title="Bookmark Document">
+                                                    <span class="glyphicon glyphicon-star" style="color: #555555"></span>
+                                                </a>
+                                            }
+                                        }
+
+
+
+                                        @if(role==0 || doc.getDozentEmail==email) {
+                                            <a href="@routes.DocumentControllerSama.documentPage(doc.getDocumentID, true)">
+                                                <span class="glyphicon glyphicon-pencil" aria-hidden="true" style="color: #555555"></span>
+                                                <span style="color: #555555"> </span>
+                                            </a>
+                                        }
+
+                                    </div>
+                                }
+                        }
+
+                        <script>
+                        if(document.getElementById("docForSub@sub.getSubjectID")){
+
+                        }else{
+                        var divNoSubject = document.createElement("div");
+                        divNoSubject.className = "list-group-item";
+                        var text = document.createElement("i");
+                        text.setAttribute("style", "margin-left: 20px");
+                        text.appendChild(document.createTextNode("No Documents yet"));
+
+                        divNoSubject.appendChild(text);
+                        document.getElementById("sub@sub.getSubjectID").appendChild(divNoSubject);
+                        }
+                        </script>
+
+                    </div>
+                }
+
+            }
+        </div>
+    }
+
+}

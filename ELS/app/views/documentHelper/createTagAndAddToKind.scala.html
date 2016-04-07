@@ -1,0 +1,31 @@
+@(documentID: Integer)(id: Integer)(kind: Integer)(moderators: java.util.List[User])(dozent: String)(usermail: String)(role: Int)
+<!-- kind of class on which tag will be added 0 := chapter, 1 := comment, 2 := subComment 3:= headline 4:= subHeadline -->
+
+<!-- Modal - Create new Tag -->
+<div class="modal fade" id="createNewTagKIND@(kind)AndID@id" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog text-left">
+        <div class="modal-content">
+            <div class="modal-header" style="color: #262626;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Create new tag</h4>
+            </div>
+            <form method="post" action="@routes.TagController.createAndAddTag(kind, id, documentID)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="tagName" style="color: #323232">Enter the name for the new Tag</label>
+                        <input type="tagName" name="tagName" id="tagName" class="form-control" placeholder="Name" required>
+                        @if(role == 0 || usermail.equals(dozent) || (moderators.map((u: User) => u.getEmail)).contains(usermail)){
+                            <label for="global" style="color: #323232">Do you want this tag to be visible for all users of this document? (You won't be able to use it on any other document though)</label>
+                            <input type="checkbox" name="global" id="global" class="form-control">
+                        }
+                    </div>
+                    <p style="color: #333333" >The current selection will be tagged automatically.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="bt1" type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

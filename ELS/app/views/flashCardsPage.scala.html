@@ -1,0 +1,126 @@
+@(user: User)(flashCards: java.util.List[FlashCard])(bookmarkedDocs: java.util.List[Document])(tags: java.util.List[Tag])
+
+@mainFrame("FlashCards")(user.getEmail())(user.getRole()){
+
+    @mainPageNavigation("flashcard")
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>My FlashCards</h2>
+            <ul class="list-group">
+            @for(flashCard <- flashCards) {
+                <li class="list-group-item">
+                    <a tabindex="-1" href="@routes.FlashCardControllerSensei.flashCardPage(flashCard.getFlashCardID, false)">@flashCard.getFlashCardName</a>
+
+                    <a href="@routes.FlashCardControllerSensei.flashCardPage(flashCard.getFlashCardID, true)">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+
+                    <a data-toggle="modal" data-target="#deleteFlashCard@flashCard.getFlashCardID">
+                        <span class="glyphicon glyphicon-trash"></span>
+                    </a>
+
+                    <!-- Modal - Confirm delete of FlashCard -->
+                    <div class="modal fade" id="deleteFlashCard@flashCard.getFlashCardID" tabindex="-1" role="dialog" aria-labelledby="deleteFlashCard" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Delete FlashCard</h4>
+                                </div>
+                                <div class="modal-body">
+                Are you sure that you want to delete the FlashCard?
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="@routes.FlashCardControllerSensei.deleteFlashCard(flashCard.getFlashCardID)" class="btn btn-primary" type="button"> Ok </a>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </li>
+            }
+            @if(flashCards.size==0){
+                <li class="list-group-item"><i>No Flashcard yet</i></li>
+            }
+            </ul>
+        </div>
+
+
+        <div class="col-md-4 col-md-offset-3">
+            <h2>Create FlashCard</h2>
+            <ul class="list-group" id="myDocumentList">
+
+
+            </ul>
+
+            <div class="btn-group">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                    New FlashCard <span class="glyphicon glyphicon-menu-down"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    @for(doc <- bookmarkedDocs) {
+                        <li class="dropdown-submenu">
+                            <a tabindex="-1" href="#">@doc.getDocumentName</a>
+                            <ul class="dropdown-menu">
+                                @for(tag <- tags) {
+                                    @if(tag.isGlobal){
+                                        @if(tag.getDocID == doc.getDocumentID){
+                                            <li><a href="#createFlashCard@(doc.getDocumentID)To@(tag.getTagID)" data-toggle="modal">@tag.getTagName</a></li>
+                                        }
+                                    }else{
+                                        <li><a href="#createFlashCard@(doc.getDocumentID)To@(tag.getTagID)" data-toggle="modal">@tag.getTagName</a></li>
+                                    }
+
+                                }
+                                @if(tags.size==0){
+                                    <li><a><i>no tag available</i></a></li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                    @if(bookmarkedDocs.size==0) {
+                        <li><a><i>no bookmarked document</i></a></li>
+                    }
+                </ul>
+            </div>
+            <div style="margin-top: 15px;">
+                <p>Your document doesn't appear in the list? Please make sure that you have bookmarked it.</p>
+            </div>
+        </div>
+    </div>
+
+
+    @for(doc <- bookmarkedDocs) {
+        @for(tag <- tags) {
+
+            <!-- Modal - Create FlashCard -->
+            <div class="modal fade" id="createFlashCard@(doc.getDocumentID)To@(tag.getTagID)" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Create FlashCard</h4>
+                        </div>
+                        <form method="post" action="@routes.FlashCardControllerSensei.createFlashCard(doc.getDocumentID, tag.getTagID)" >
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="flashcardname">Name of the FlashCard</label>
+                                    <input type="text" name="flashcardname" class="form-control" id="flashcardname" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input type="submit" class="btn btn-primary" value="Create" class="btn btn-primary">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+
+}

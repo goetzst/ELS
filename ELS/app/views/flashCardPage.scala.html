@@ -1,0 +1,273 @@
+@(flashcard: FlashCard)(chapters: java.util.List[ChapterChan])(headlinesToChapters: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subheadlinesToHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(contentsOfChapter: java.util.HashMap[Integer, java.util.List[models.Content]])(contentsOfHeadline: java.util.HashMap[Integer, java.util.List[models.Content]])(contentsOfSubHeadline: java.util.HashMap[Integer, java.util.List[models.Content]])(commentsToContent: java.util.HashMap[Integer, java.util.List[Comment]])(subcommentsToComments: java.util.HashMap[Integer, java.util.List[SubComment]])(email: String)(role: Integer)(editable: Boolean)
+@import java.util
+@import java.util.Collections
+
+@mainFrame(flashcard.getFlashCardName)(email)(role){
+
+    @mainPageNavigation("flashcard")
+
+    <!--<p>chapters: @chapters.size()</p>
+    <p>chapterContent: @contentsOfChapter.keySet()</p>
+    <p>headlines: @headlinesToChapters.size()</p>
+    <p>headlineContent: @contentsOfHeadline.size()</p>
+    <p>subheadlines: @subheadlinesToHeadlines.size()</p>
+    <p>subHeadlineContent: @contentsOfSubHeadline.size()</p>
+
+    <p>comments: @commentsToContent.size()</p>
+    <p>subcomments: @subcommentsToComments.size()</p>-->
+
+
+
+
+
+    <div class="bs-example">
+
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+
+            <!-- Carousel indicators not used -->
+            <ol class="carousel-indicators">
+
+                @for(chapter: models.ChapterChan <- chapters ){
+                    @if(contentsOfChapter.get(chapter.getChapterID).size()!=0) {
+                        <li data-target="#myCarousel" class="bobbel"></li>
+                    }
+
+                    @for(headline: ContentHeadline <- headlinesToChapters.get(chapter.getChapterID)) {
+                        @if(contentsOfHeadline.get(headline.getcHeadLineID()).size()!=0) {
+                            <li data-target="#myCarousel" class="bobbel"></li>
+                        }
+
+                        @for(subHeadline: ContentSubHeadline <- subheadlinesToHeadlines.get(headline.getcHeadLineID())) {
+                            @if(contentsOfSubHeadline.get(subHeadline.getcSubHeadLineID()).size()!=0) {
+                                <li data-target="#myCarousel" class="bobbel"></li>
+                            }
+
+                        }
+                    }
+                }
+            </ol>
+
+            <!-- Carousel items -->
+            <div class="carousel-inner" ondblclick="fullscreen();" >
+
+
+                @for(chapter: models.ChapterChan <- chapters ){
+                    @if(contentsOfChapter.get(chapter.getChapterID).size()!=0) {
+                        <!-- @if(chapters.get(0).getChapterID == chapter.getChapterID) {active} -->
+                        <div class="item ">
+                            <!--<h2>@chapter.getTitle</h2>-->
+                            <div class="carousel-caption">
+                                <h2>@chapter.getTitle</h2>
+                                @if(contentsOfChapter.get(chapter.getChapterID).size == 0) {
+                                    <p><i>no content yet</i></p>
+                                }
+                                @for(contentChaper: models.Content <- contentsOfChapter.get(chapter.getChapterID)) {
+                                    @Html(contentChaper.getContent)
+
+                                    @for(comment: Comment <- commentsToContent.get(contentChaper.getContentID)) {
+                                        <div>
+                                            <p style="text-align: left !important;">
+                                                <i class="fa fa-user"><small>@comment.getUserEmail: </small></i>
+                                                @comment.getContent
+                                            </p>
+                                        </div>
+
+                                        @for(subComment: SubComment <- subcommentsToComments.get(comment.getCommentID)) {
+                                            <div>
+                                                <p style="text-align: left !important; margin-left: 25px;">
+                                                    <i class="fa fa-user"><small> @subComment.getUserEmail </small></i>
+                                                    @subComment.getContent
+                                                </p>
+                                            </div>
+                                        }
+                                    }
+                                }
+
+                            </div>
+                        </div>
+                    }
+
+
+                    @for(headline: ContentHeadline <- headlinesToChapters.get(chapter.getChapterID)) {
+                        @if(contentsOfHeadline.get(headline.getcHeadLineID()).size()!=0) {
+                            <div class="item">
+                                <!--<h3>@headline.getTitle</h3>-->
+                                <div class="carousel-caption">
+                                    <h2>@chapter.getTitle</h2>
+                                    <h3>@headline.getTitle</h3>
+                                    @if(contentsOfHeadline.get(headline.getcHeadLineID()).size == 0) {
+                                        <p><i>no content yet</i></p>
+                                    }
+                                    @for(contentHeadline: models.Content <- contentsOfHeadline.get(headline.getcHeadLineID())) {
+                                        @Html(contentHeadline.getContent)
+
+                                        @for(comment: Comment <- commentsToContent.get(contentHeadline.getContentID)) {
+                                            <div>
+                                                <p style="text-align: left !important;">
+                                                    <i class="fa fa-user"><small>@comment.getUserEmail: </small></i>
+                                                    @comment.getContent
+                                                </p>
+                                            </div>
+
+                                            @for(subComment: SubComment <- subcommentsToComments.get(comment.getCommentID)) {
+                                                <div>
+                                                    <p style="text-align: left !important; margin-left: 25px;">
+                                                        <i class="fa fa-user"><small> @subComment.getUserEmail </small></i>
+                                                        @subComment.getContent
+                                                    </p>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+
+
+                        @for(subHeadline: ContentSubHeadline <- subheadlinesToHeadlines.get(headline.getcHeadLineID())) {
+                            @if(contentsOfSubHeadline.get(subHeadline.getcSubHeadLineID()).size()!=0) {
+
+                                <div class="item">
+                                    <!--<h4>@subHeadline.getTitle</h4>-->
+                                    <div class="carousel-caption">
+                                        <h2>@chapter.getTitle</h2>
+                                        <h3>@headline.getTitle</h3>
+                                        <h4 style="margin-top: 18px;" >@subHeadline.getTitle</h4>
+                                        @if(contentsOfSubHeadline.get(subHeadline.getcSubHeadLineID()).size == 0) {
+                                            <p><i>no content yet</i></p>
+                                        }
+                                        @for(contentSubHeadline: models.Content <- contentsOfSubHeadline.get(subHeadline.getcSubHeadLineID())) {
+                                            @Html(contentSubHeadline.getContent)
+
+                                            @for(comment: Comment <- commentsToContent.get(contentSubHeadline.getContentID)) {
+                                                <div>
+                                                    <p style="text-align: left !important;">
+                                                        <i class="fa fa-user"><small>@comment.getUserEmail: </small></i>
+                                                        @comment.getContent
+                                                    </p>
+                                                </div>
+
+                                                @for(subComment: SubComment <- subcommentsToComments.get(comment.getCommentID)) {
+                                                    <div>
+                                                        <p style="text-align: left !important; margin-left: 25px;">
+                                                            <i class="fa fa-user"><small> @subComment.getUserEmail </small></i>
+                                                            @subComment.getContent
+                                                        </p>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                        }
+                    }
+                }
+            </div>
+
+
+
+            <div class="item " id="noContent" hidden="hidden">
+                <div class="carousel-caption">
+                    <h2><i>no content yet</i></h2>
+                </div>
+            </div>
+
+
+                <!-- Carousel nav -->
+            <a class="carousel-control left" href="#myCarousel" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+            <a class="carousel-control right" href="#myCarousel" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- Correct the position of the images -->
+    <script>
+        var images = document.getElementsByClassName('img-responsive');
+        //not for the first one because its the logo
+        for(var i = 1; i < images.length; i++){
+            images[i].setAttribute('style', 'display: block; margin: 0 auto;');
+        }
+    </script>
+
+    <!-- Set the active item -->
+    <script>
+        var item = document.getElementsByClassName("item");
+        item[0].setAttribute("class", "item active");
+        item[0].removeAttribute("hidden", "hidden");
+    </script>
+
+    <!-- Set the right sequence to the navigation bobbels -->
+    <script>
+        var bobbels = document.getElementsByClassName('bobbel');
+        for(var i = 0; i < bobbels.length; i++){
+            bobbels[i].setAttribute('data-slide-to', i);
+        }
+        bobbels[0].setAttribute('class','bobbel active');
+    </script>
+
+
+    <!-- Set the style for outer element to get the maximum height - needed for height: 100% -->
+    <script>
+        document.getElementsByTagName('html')[0].setAttribute('style', 'height: 100% !important;');
+        document.body.setAttribute('style', 'height: 100% !important;');
+
+        document.getElementsByClassName("container-fluid")[0].setAttribute('style', 'height: 100% !important;');
+        document.getElementsByClassName("bs-example")[0].setAttribute('style', 'height: 100% !important;');
+        document.getElementsByClassName("col-md-10")[0].setAttribute('style', 'height: 100% !important;');
+        document.getElementsByClassName("col-md-offset-1")[0].setAttribute('style', 'height: 100% !important;');
+
+        document.getElementsByClassName("carousel")[0].setAttribute('style', 'height: 100% !important;');
+        document.getElementsByClassName("slide")[0].setAttribute('style', 'height: 100% !important;');
+        document.getElementsByClassName("carousel-inner")[0].setAttribute('style', 'height: 100% !important;');
+    </script>
+
+
+    <!-- display the flashcard in fullscreen -->
+    <script>
+        function fullscreen(){
+            document.getElementsByClassName("bs-example")[0].setAttribute('class', 'overlay');
+
+            //removes the outer scrollbar
+            document.getElementsByTagName('html')[0].setAttribute('style', 'overflow: hidden !important;');
+            document.body.setAttribute('style', 'overflow: hidden !important;');
+        }
+    </script>
+
+    <!-- listen to ESC key and disable fullscreen and go back to old view -->
+    <script>
+        window.onkeydown = onkeyup;
+
+        function onkeyup(e){
+            e = e || event;
+            if(e.keyCode==27){ //keyCode 27 is ESC
+                var elem = document.getElementsByClassName("overlay")[0];
+                elem.removeAttribute('class');
+                elem.setAttribute('class', 'bs-example');
+
+                //adds the outer scrollbar
+                document.getElementsByTagName('html')[0].removeAttribute('style');
+                document.body.removeAttribute('style');
+                document.getElementsByTagName('html')[0].setAttribute('style', 'height: 100% !important;');
+                document.body.setAttribute('style', 'height: 100% !important;');
+            }
+        }
+
+    </script>
+
+    <!-- Change background-color for Latex-Formeln -->
+    <script>
+        var images = document.getElementsByTagName('img');
+        for (var i=0; i<images.length; i++){
+            if(images[i].hasAttribute('title')){
+                images[i].setAttribute('style','background-color: white; padding: 10px;');
+            }
+        }
+    </script>
+
+}

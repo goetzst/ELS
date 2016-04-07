@@ -1,0 +1,414 @@
+@(flashcard: FlashCard)(chapters: java.util.List[ChapterChan])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(contentToChapters: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToSubHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(commentsToContent: java.util.HashMap[Integer, java.util.List[Comment]])(subcommentsToComments: java.util.HashMap[Integer, java.util.List[SubComment]])(chaptersDoc: java.util.List[ChapterChan])(headlinesDoc: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlinesDoc: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(email: String)(role: Integer)(editable: Boolean)
+@import java.util
+@import java.util.Collections
+
+@mainFrame(flashcard.getFlashCardName)(email)(role){
+
+    @mainPageNavigation("flashcard")
+
+    <!-- <p>chapters: @chapters.size()</p>
+    <p>chapterContent: @contentToChapters.keySet()</p>
+    <p>headlines: @headlines.size()</p>
+    <p>headlineContent: @contentToHeadlines.size()</p>
+    <p>subheadlines: @subHeadlines.size()</p>
+    <p>subHeadlineContent: @contentToSubHeadlines.size()</p>
+
+    <p>comments: @commentsToContent.size()</p>
+    <p>subcomments: @subcommentsToComments.size()</p>-->
+
+
+    <div class="row">
+
+        <!-- Navbar -->
+        <div class="col-md-3 hidden-print" id="leftColumn">
+            <div id="mynav" data-mcs-theme="dark" data-spy="affix" data-offset-top="243">
+            <div class="list-group" >
+                <ul class="nav" >
+                @for(chapter: ChapterChan <- chapters){
+                    <li class="nav-link"><a href="#chapter@chapter.getChapterID"><b>@chapter.getTitle</b> <span class="sr-only">(current)</span></a></li>
+
+                    @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)){
+                        <li class="nav-link"><a href="#headline@headline.getcHeadLineID">@headline.getTitle</a></li>
+
+                        @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID)){
+                            <li class="nav-link" style="padding-left: 5px"><a href="#subHeadline@subHeadline.getcSubHeadLineID" > @subHeadline.getTitle</a></li>
+                        }
+                    }
+                }
+                </ul>
+            </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-md-7 col-sm-7">
+
+
+            <header>
+                <h1>@flashcard.getFlashCardName</h1>
+            </header>
+
+            @flashcardHelper.deleteFlashCard(flashcard.getFlashCardID)
+            @flashcardHelper.editFlashcardName(flashcard)
+            @flashcardHelper.addChapter(flashcard)(chapters)
+            <a href="@routes.FlashCardControllerSensei.updateFlashCard(flashcard.getFlashCardID)" class="btn btn-primary">updateFlashCard</a>
+
+
+
+
+            @for(chapter: ChapterChan <- chapters) {
+                <div class="chapter" >
+
+                    <!--- Chapter Title with the TAG-Button and Tags--->
+                    <div class="chapterTitle row ">
+                        <div class="col-md-12">
+
+                            <h2 style="display: inline" id="chapter@chapter.getChapterID">@chapter.getTitle</h2>
+
+                            <!-- Delete Chapter -->
+                            <a data-toggle="modal" data-target="#confirmDeleteChapter@chapter.getChapterID" >
+                                <span data-toggle="tooltip" title="Delete this chapter" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </a>
+                            @flashcardHelper.deleteChapter(flashcard.getFlashCardID)(chapter.getChapterID)
+
+                            <!-- Change Chapter -->
+                            <a data-toggle="modal" href="#editChapter@chapter.getChapterID" aria-expanded="false" aria-controls="modalExample">
+                                <span data-toggle="tooltip" title="Edit this Chapter" class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            @flashcardHelper.editChapter(flashcard)(chapter)(chapters)
+
+                            <!-- Add new Content to Chapter -->
+                            <a data-toggle="collapse" data-target="#chapterCollapse@chapter.getChapterID" onclick="setRadioButtonDefault('chapterRadio@(chapter.getChapterID)_1')" aria-expanded="false">
+                                <span data-toggle="tooltip" title="Add content to this chapter" class="glyphicon glyphicon-plus"></span>
+                            </a>
+                            <!-- Functionality imported below - reason: css -->
+
+                        </div>
+                    </div>
+
+                    <div class="chapterContent">
+
+                        <!-- Import functionality for add content to chapter -->
+                        @flashcardHelper.addContentToChapter(flashcard)(chapter)(contentToChapters)(headlines)
+
+
+                    <!-- Display the content for chapter -->
+                        @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+
+                            <div class="content @if(content.getType==0){contentText}@if(content.getType==1){contentImage}@if(content.getType==2){contentCode}" id="content@content.getContentID">
+                                <div class="contentHead">
+                                    <!-- Delete Content -->
+                                    @flashcardHelper.deleteContent(flashcard.getFlashCardID)(content)
+
+                                    <!-- Edit Content -->
+                                    <a href="@routes.FlashCardControllerSensei.changeContentFlascardPage(flashcard.getFlashCardID, content.getContentID, chapter.getChapterID,0)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                    <!-- Suggest Content -->
+                                    @flashcardHelper.addSuggestion(content)(chaptersDoc)(headlinesDoc)(subHeadlinesDoc)
+                                </div>
+                                <div class="contentBody">
+                                    @Html(content.getContent)
+                                </div>
+                            </div>
+
+                        }
+
+
+
+                        @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)) {
+
+                            <div class="headline">
+                                <div class="headlineTitle row">
+                                    <div class="col-md-10">
+
+                                        <h3 style="display: inline;" id="headline@headline.getcHeadLineID">@headline.getTitle</h3>
+
+                                        <!-- Delete Headline -->
+                                        @flashcardHelper.deleteHeadline(flashcard)(headline)
+
+                                        <!-- Edit Headline -->
+                                        @flashcardHelper.editHeadline(flashcard)(chapter)(headline)(headlines)
+
+                                        <!-- Add a new content to the Headline -->
+                                        <a data-toggle="collapse" href="#headlineAddContent@headline.getcHeadLineID()" onclick="setRadioButtonDefault('headlineRadio@(headline.getcHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+                                            <span data-toggle="tooltip" title="Add new Content to this Headline" class="glyphicon glyphicon-plus"></span>
+                                        </a>
+                                        <!-- Functionality imported below - reason: css -->
+
+                                    </div>
+                                </div>
+
+
+
+                                <div class="headlineContent">
+
+                                    <!-- Import functionality for add content to headline -->
+                                    @flashcardHelper.addContentToHeadline(flashcard)(headline)(contentToHeadlines)(subHeadlines)
+
+                                    @for(headlineContent: models.Content <- contentToHeadlines.get(headline.getcHeadLineID)) {
+
+                                        <div class="content @if(headlineContent.getType == 0) {contentText} @if(headlineContent.getType == 1) {contentImage} @if(headlineContent.getType == 2) {contentCode}" id="content@headlineContent.getContentID">
+                                            <div class="contentHead">
+
+                                                <!-- Delete Content -->
+                                                @flashcardHelper.deleteContent(flashcard.getFlashCardID)(headlineContent)
+
+                                                <!-- Edit Content -->
+                                                <a href="@routes.FlashCardControllerSensei.changeContentFlascardPage(flashcard.getFlashCardID, headlineContent.getContentID, chapter.getChapterID,1)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                                <!-- Suggest Content -->
+                                                @flashcardHelper.addSuggestion(headlineContent)(chaptersDoc)(headlinesDoc)(subHeadlinesDoc)
+                                            </div>
+                                            <div class="contentBody">
+                                                @Html(headlineContent.getContent)
+                                            </div>
+                                        </div>
+                                    }
+
+
+
+                                    <!-- Display the SubHeadline with its content -->
+                                    @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID)) {
+                                        <div class="subHeadline">
+                                            <div class="subHeadlineTitle row">
+                                                <div class="col-md-10">
+
+
+                                                    <h4 style="display: inline;" id="subHeadline@subHeadline.getcSubHeadLineID"> @subHeadline.getTitle </h4>
+
+                                                    <!-- Delete SubHeadline -->
+                                                    @flashcardHelper.deleteSubHeadline(flashcard)(subHeadline)
+                                                    <!-- Edit SubHeadline -->
+                                                    @flashcardHelper.editSubHeadline(flashcard)(subHeadline)(subHeadlines)(headline)
+
+                                                    <!-- Add a new content to the SubHeadline -->
+                                                    <a data-toggle="collapse" href="#subHeadlineAddContent@subHeadline.getcSubHeadLineID()" onclick="setRadioButtonDefault('subHeadlineRadio@(subHeadline.getcSubHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+                                                        <span data-toggle="tooltip" title="Add new Content to this SubHeadline" class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                    <!-- Functionality imported below - reason: css -->
+
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="subHeadlineContent">
+
+                                                <!-- Import functionality for add content to subHeadline -->
+                                                @flashcardHelper.addContentToSubHeadline(flashcard)(subHeadline)(contentToSubHeadlines)
+
+
+                                                @for(subHeadlineContent: models.Content <- contentToSubHeadlines.get(subHeadline.getcSubHeadLineID)) {
+
+                                                    <div class="content @if(subHeadlineContent.getType == 0) {contentText} @if(subHeadlineContent.getType == 1) {contentImage} @if(subHeadlineContent.getType == 2) {contentCode}" id="content@subHeadlineContent.getContentID">
+                                                        <div class="contentHead">
+
+                                                            <!-- Delete Content -->
+                                                            @flashcardHelper.deleteContent(flashcard.getFlashCardID)(subHeadlineContent)
+
+                                                            <!-- Edit Content -->
+                                                            <a href="@routes.FlashCardControllerSensei.changeContentFlascardPage(flashcard.getFlashCardID, subHeadlineContent.getContentID, chapter.getChapterID,2)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                                            <!-- Suggest Content -->
+                                                            @flashcardHelper.addSuggestion(subHeadlineContent)(chaptersDoc)(headlinesDoc)(subHeadlinesDoc)
+
+                                                        </div>
+                                                        <div class="contentBody">
+                                                            @Html(subHeadlineContent.getContent)
+                                                        </div>
+                                                    </div>
+
+                                                }
+
+                                            </div> <!-- End subHeadlineContent -->
+                                        </div> <!-- End subHeadline -->
+                                    }
+                                </div> <!-- End headlineContent -->
+                            </div> <!-- End Headline -->
+                        }
+                    </div> <!-- End chapterContent -->
+                </div> <!-- End chapter -->
+            }
+
+
+        </div>
+
+
+        <!-- Filter elements -->
+        <div class="col-md-2 col-sm-2">
+                <!-- Filter-function  -->
+            <div class="checkbox newContent" id="filter" data-spy="affix" data-offset-top="243">
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="contentText" /> Hide all Text
+                </label>
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="contentImage" /> Hide all Image
+                </label>
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="contentCode" /> Hide all Code
+                </label>
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="headline" /> Hide all Headlines with its content
+                </label>
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="subHeadline" /> Hide all SubHeadlines with its content
+                </label>
+                <label>
+                    <input type="checkbox" onchange="filter(this)" value="commentButton" /> Hide all comment buttons
+                </label>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- Filter elements by class name -->
+    <script>
+        function filter(rb){
+            var type = rb.value;
+            var elementsToHide = document.getElementsByClassName(type);
+
+            for(var i = 0; i < elementsToHide.length; i++){
+                if(elementsToHide[i].hasAttribute('hidden')){
+                    elementsToHide[i].removeAttribute('hidden');
+                }else{
+                    elementsToHide[i].setAttribute('hidden', 'hidden');
+                }
+            }
+        }
+    </script>
+
+    <!-- Controlls the file types for uploaded files -->
+    <script>
+        var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+        function Validate(oForm, idOfWarningElement) {
+        var arrInputs = oForm.getElementsByTagName("input");
+        for (var i = 0; i < arrInputs.length; i++) {
+            var oInput = arrInputs[i];
+            if (oInput.type == "file") {
+                var sFileName = oInput.value;
+                if (sFileName.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            break;
+                        }
+                    }
+
+                    if (!blnValid) {
+                        var warn = document.getElementById(idOfWarningElement);
+                        warn.className = 'label label-danger';
+                        warn.innerHTML = 'Sorry, not allowed. Allowed extensions are: ' + _validFileExtensions.join(", ");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    </script>
+
+    <!-- Hide newComment Button by id -->
+    <script>
+        function hideNewCommentButton(id){
+            document.getElementById(id).setAttribute("hidden", "true");
+        }
+    </script>
+
+    <!-- Set Radio Button (referenced by id) checked. Used when you add a new content. -->
+    <script>
+        function setRadioButtonDefault(id) {
+            document.getElementById(id).setAttribute("checked", "checked");
+        }
+    </script>
+
+
+    <!-- When you add a content you can choose (by selecting the different radio buttons) which content it should be.
+     Depending on which content it should there are different input fields to display.
+     This function manage the showing/hiding of this input fields. -->
+    <script>
+        function setTypeOfContentToAddVisible(rb, idOfElement) {
+        var clicked = rb.value;
+        if(clicked == 'text'){
+            document.getElementById('contentText_for'+idOfElement).removeAttribute("hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'image'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).removeAttribute("hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'code'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).removeAttribute("hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'newHeadline'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentNewHeadline_for'+idOfElement).removeAttribute("hidden");
+        }
+        if(clicked == 'newSubHeadline'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentNewSubHeadline_for'+idOfElement).removeAttribute("hidden");
+        }
+    }
+    </script>
+
+    <script>
+        function updateLanguageOfCodeEditor(id){
+            var languageSelection = document.getElementById('mode_'+id);
+            var language = languageSelection.options[languageSelection.selectedIndex].value;
+
+            var editor = ace.edit('editor_'+id);
+            editor.getSession().setMode("ace/mode/"+language);
+        };
+    </script>
+
+
+    <script>
+        $(function(){
+            var sideBarNavWidth=$('#leftColumn').width() - parseInt($('#mynav').css('paddingLeft')) - parseInt($('#mynav').css('paddingRight'));
+        $('#mynav').css('width', sideBarNavWidth);
+        });
+
+        window.onresize = function(event) {
+            var sideBarNavWidth=$('#leftColumn').width() - parseInt($('#mynav').css('paddingLeft')) - parseInt($('#mynav').css('paddingRight'));
+        $('#mynav').css('width', sideBarNavWidth);
+
+        };
+    </script>
+
+
+
+}

@@ -1,0 +1,21 @@
+@(commentID: Integer)(contentID: Integer)(documentID: Integer)(toEdit: Boolean)
+
+<!-- no own page -> no mainFrame -->
+<div class="subcomment">
+
+    @if(!toEdit){
+        <form method="post" action="@routes.CommentController.newSubComment(commentID, contentID, documentID, 0)">
+    }else{
+        <form method="post" action="@routes.CommentController.newSubComment(commentID, contentID, documentID, 1)">
+    }
+        <div class="form-group">
+            <label for="subComment" hidden>Text</label>
+            <textarea id="subComment" placeholder="Type your subcomment here..." name="content" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Make new SubComment">
+        </div>
+    </form>
+
+
+</div>

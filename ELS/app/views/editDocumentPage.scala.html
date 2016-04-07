@@ -1,0 +1,36 @@
+@(s: String)(docID: Integer)
+
+
+<nav class="navbar navbar-default hidden-print" >
+    <ul class="nav navbar-nav">
+
+        <li @if(s.equals("home")) {class="active"} >
+            <a href="@routes.DocumentControllerSama.documentPage(docID, true)">Home  </a>
+        </li>
+
+        @if(s.equals("editContent")){
+            <li class="active">
+                <a href="#">Edit Content</a>
+            </li>
+        }
+
+        @if(Integer.parseInt(play.mvc.Http.Context.current().session().get("role")) <= 1) {
+            <li role="presentation"@if(s.equals("moderators")) {class="active"}>
+                <a href="@routes.ModeratorController.moderatorPage(docID)">Moderators</a>
+            </li>
+        }
+
+        @if(Integer.parseInt(play.mvc.Http.Context.current().session().get("role")) <= 1) {
+            <li @if(s.equals("version")) {class="active"} >
+                <a href="@routes.VersionController.versionPage(docID)">Version</a>
+            </li>
+        }
+
+        @if(Integer.parseInt(play.mvc.Http.Context.current().session().get("role")) <= 1) {
+            <li @if(s.equals("suggestion")) {class="active"} >
+                <a href="@routes.SuggestionController.documentSuggestionPage(docID)">Suggestions</a>
+            </li>
+        }
+
+    </ul>
+</nav>

@@ -1,0 +1,19 @@
+@(contentID: Integer)(documentID: Integer)(toEdit: Boolean)
+
+<!-- no own page -> no mainFrame -->
+<div class="form-group" >
+
+    @if(!toEdit){
+        <form method="post" action="@routes.CommentController.newComment(contentID, documentID, 0)">
+    }else{
+        <form method="post" action="@routes.CommentController.newComment(contentID, documentID, 1)">
+    }
+        <div class="form-group">
+            <label for="comment" hidden>Text</label>
+            <textarea id="comment" placeholder="Type your comment here..." name="content" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Make new Comment">
+        </div>
+    </form>
+</div>

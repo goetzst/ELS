@@ -1,0 +1,169 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                                                                                                controllers.MainPageController.mainPage()
+GET         /documents/:id                                                                                   controllers.DocumentControllerSama.documentPage(id: Integer, edit: Boolean =false)
+
+
+GET         /register                                                                                        controllers.RegisterController.registerPage()
+POST        /register                                                                                        controllers.RegisterController.register()
+
+GET         /login                                                                                           controllers.LoginController.loginPage()
+POST        /login                                                                                           controllers.LoginController.authenticate()
+GET         /logout                                                                                          controllers.LoginController.logout()
+
+GET         /newdocument                                                                                     controllers.DocumentControllerSama.newDocumentPage()
+POST        /newdocument                                                                                     controllers.DocumentControllerSama.createDocument()
+
+GET         /documents                                                                                       controllers.MainPageController.documentListPage()
+
+
+
+GET         /documents/:documentID/bookmarkDocument                                                          controllers.DocumentControllerSama.bookmarkDocument(documentID: Integer)
+GET         /documents/:documentID/deleteBookmark                                                            controllers.DocumentControllerSama.deleteBookmark(documentID: Integer)
+
+##GET         /documents/:documentID/:chapterID/newComment                                       controllers.CommentController.newCommentPage(chapterID: Integer, documentID: Integer)
+POST        /documents/:documentID/:contentID/newComment/:redirectTo                                         controllers.CommentController.newComment(contentID: Integer, documentID: Integer, redirectTo: Integer)
+
+GET         /documents/:docID/:chapterID/deleteChapter                                                       controllers.ContentController.deleteChapter(chapterID: Integer, docID: Integer)
+GET         /documents/:parentID/:contentID/:typeOfParent/deleteContent                                      controllers.ContentController.deleteContent(contentID: Integer, parentID: Integer, typeOfParent: Integer)
+GET         /documents/:chapterID/:cHeadlineID/deleteHeadline                                                controllers.ContentController.deleteContentHeadline(cHeadlineID: Integer, chapterID: Integer)
+GET         /documents/:cHeadlineID/:cSubHeadlineID/deleteSubHeadline                                        controllers.ContentController.deleteContentSubHeadline(cSubHeadlineID: Integer, cHeadlineID: Integer)
+
+POST        /documents/:chapterID/addContentToChapter                                                        controllers.ContentController.addContentToChapter(chapterID: Integer)
+POST        /documents/:cHeadlineID/addContentToHeadline                                                     controllers.ContentController.addContentToContentHeadline(cHeadlineID: Integer)
+POST        /documents/:cSubHeadlineID/addContentToSubHeadline                                               controllers.ContentController.addContentToContentSubHeadline(cSubHeadlineID: Integer)
+
+POST        /documents/:documentID/addNewChapter                                                             controllers.ContentController.addChapter(documentID: Integer)
+POST        /documents/:chapterID/addContentHeadlineToChapter                                                controllers.ContentController.addContentHeadline(chapterID: Integer)
+POST        /documents/:headlineID/addContentSubHeadlineToHeadline                                           controllers.ContentController.addContentSubHeadline(headlineID: Integer)
+
+POST        /documents/:documentID/:chapterID/editChapter                                                    controllers.ContentController.changeChapter(documentID: Integer, chapterID: Integer)
+POST        /documents/:chapterID/:cHeadlineID/editContentHeadline                                           controllers.ContentController.changeContentHeadline(cHeadlineID: Integer, chapterID: Integer)
+POST        /documents/:cHeadlineID/:cSubHeadLineID/editContentSubHeadline                                   controllers.ContentController.changeContentSubHeadline(cSubHeadLineID: Integer, cHeadlineID: Integer)
+
+GET         /documents/:aID/:contentID/:typeID/editContent                                                   controllers.ContentController.changeContentPage(contentID: Integer, aID: Integer, typeID: Integer)
+POST        /documents/:aID/:contentID/:typeID/editContent                                                   controllers.ContentController.changeContent(contentID: Integer, aID: Integer, typeID: Integer)
+
+
+#GET         /documents/:documentID/:chapterID/:commentID/editComment                           controllers.CommentController.editCommentPage(commentID: Integer, chapterID: Integer, documentID: Integer)
+POST        /documents/:documentID/:contentID/:commentID/editComment/:redirectTo                             controllers.CommentController.editComment(commentID: Integer, contentID: Integer, documentID: Integer, redirectTo: Integer)
+
+GET         /documents/:documentID/:contentID/:commentID/deleteComment/:redirectTo                           controllers.CommentController.deleteComment(commentID: Integer, contentID: Integer, documentID: Integer, redirectTo: Integer)
+
+#GET         /documents/:documentID/:chapterID/:commentID/newSubComment                         controllers.CommentController.newSubCommentPage(commentID: Integer, chapterID: Integer, documentID: Integer)
+POST        /documents/:documentID/:contentID/:commentID/newSubcomment/:redirectTo                           controllers.CommentController.newSubComment(commentID: Integer, contentID: Integer, documentID: Integer, redirectTo : Integer)
+
+#GET         /documents/:documentID/:chapterID/:commentID/:subCommentID/editSubComment          controllers.CommentController.editSubCommentPage(subCommentID: Integer, commentID: Integer, chapterID: Integer, documentID: Integer)
+POST        /documents/:documentID/:contentID/:commentID/:subCommentID/editSubComment/:redirectTo            controllers.CommentController.editSubComment(subCommentID: Integer, commentID: Integer, contentID: Integer, documentID: Integer, redirectTo: Integer)
+
+GET         /documents/:documentID/:contentID/:commentID/:subCommentID/deleteSubComment/:redirectTo          controllers.CommentController.deleteSubComment(subCommentID: Integer, commentID: Integer, contentID: Integer, documentID: Integer, redirectTo: Integer)
+
+GET         /documents/:documentID/editDocument                                                              controllers.DocumentControllerSama.documentPage(documentID: Integer, edit: Boolean = true)
+
+
+GET         /documents/:documentID/delete                                                                    controllers.DocumentControllerSama.deleteDocument(documentID: Integer)
+
+POST        /documents/:documentID/changeDocumentName                                                        controllers.DocumentControllerSama.changeDocumentName(documentID: Integer)
+
+GET         /documents/:documentID/editDocument/moderators                                                   controllers.ModeratorController.moderatorPage(documentID: Integer)
+GET         /documents/:documentID/editDocument/removeModerator                                              controllers.ModeratorController.deleteModerator(documentID: Integer, moderator: String)
+GET         /documents/:documentID/editDocument/addModerator                                                 controllers.ModeratorController.addModerator(documentID: Integer)
+
+GET         /editFacultiesSubjects                                                                           controllers.FacultySubjectController.editFacultySubjectPage()
+GET         /editFacultiesSubjects/deleteFaculty                                                             controllers.FacultySubjectController.removeFaculty(name: String)
+GET         /editFacultiesSubjects/changeFaculty                                                             controllers.FacultySubjectController.changeFaculty(oldName: String)
+GET         /editFacultiesSubjects/addFaculty                                                                controllers.FacultySubjectController.addFaculty()
+GET         /editFacultiesSubjects/deleteSubject                                                             controllers.FacultySubjectController.removeSubject(subjectID: Integer)
+GET         /editFacultiesSubjects/changeSubject                                                             controllers.FacultySubjectController.changeSubject(subjectID: Integer)
+GET         /editFacultiesSubjects/addSubject                                                                controllers.FacultySubjectController.addSubject()
+
+GET         /userdata                                                                                        controllers.UserDataController.userDataPage()
+POST        /userdata/:id                                                                                    controllers.UserDataController.changeUserData(id: String)
+
+GET         /restorePassword                                                                                 controllers.UserDataController.passwordForgottenPage()
+POST        /restorePassword                                                                                 controllers.UserDataController.passwordForgotten()
+GET         /restorePassword/:email/:spaceLength/:hash                                                       controllers.UserDataController.restorePasswordPage(email: String, spaceLength: Int, hash: String)
+POST        /restorePassword/:email                                                                          controllers.UserDataController.restorePassword(email: String)
+
+GET         /admin/rights                                                                                    controllers.AdminController.rightsPage()
+GET         /admin/rights/Student/:email                                                                     controllers.AdminController.changeRight(email: String, role: Integer)
+GET         /admin/rights/Dozent/:email                                                                      controllers.AdminController.changeRight(email: String, role: Integer)
+GET         /admin/rights/Admin/:email                                                                       controllers.AdminController.changeRight(email: String, role: Integer)
+
+GET         /tags                                                                                            controllers.TagController.tagsPage()
+#GET         /tag/:tagID/                                                                       controllers.TagController.tagPage(tagID: Integer)
+POST        /tag/:tagID/changeName                                                                           controllers.TagController.changeTagName(tagID: Integer)
+GET         /tag/add/:docID/:ID/:kind                                                                        controllers.TagController.addTagPage(ID: Integer, kind: Integer, docID: Integer)
+POST        /tag/add/:docID/:ID/:tagID/:kind                                                                 controllers.TagController.addTag(kind: Integer, ID: Integer, tagID: Integer, docID: Integer)
+POST        /tag/add/:docID/:ID/:kind                                                                        controllers.TagController.createAndAddTag(kind: Integer, ID: Integer, docID: Integer)
+GET         /tag/delete/:tagID/chapter/:chapterID                                                            controllers.TagController.deleteChapterChanTag(tagID: Integer, chapterID: Integer, redirectTo: Integer)
+GET         /tag/delete/:tagID/comment/:commentID                                                            controllers.TagController.deleteCommentTag(tagID: Integer, commentID: Integer, redirectTo: Integer)
+GET         /tag/delete/:tagID/subComment/:subCommentID                                                      controllers.TagController.deleteSubCommentTag(tagID: Integer, subCommentID: Integer, redirectTo: Integer)
+GET         /tag/delete/:tagID/headline/:headlineID                                                          controllers.TagController.deleteContentHeadlineTag(tagID: Integer, headlineID: Integer, redirectTo: Integer)
+GET         /tag/delete/:tagID/subHeadline/:subHeadlineID                                                    controllers.TagController.deleteContentSubHeadlineTag(tagID: Integer,subHeadlineID: Integer, redirectID: Integer)
+GET         /tag/delete/:tagID/                                                                              controllers.TagController.deleteTag(tagID: Integer)
+
+GET         /flashCards                                                                                      controllers.FlashCardControllerSensei.flashCardsPage()
+POST        /flashCards/new/:docID/:tagID                                                                    controllers.FlashCardControllerSensei.createFlashCard(docID: Integer, tagID: Integer)
+
+GET         /flashCard/:ID/                                                                                  controllers.FlashCardControllerSensei.flashCardPage(ID: Integer, edit: Boolean=false)
+GET         /flashCard/:ID/edit                                                                              controllers.FlashCardControllerSensei.flashCardPage(ID: Integer, edit: Boolean=true)
+GET         /flashCard/:ID/update                                                                            controllers.FlashCardControllerSensei.updateFlashCard(ID: Integer)
+
+
+POST        /flashCard/:flashCardID/changeName                                                               controllers.FlashCardControllerSensei.changeFlashCardName(flashCardID: Integer)
+
+GET         /flashCard/:flashCardID/delete                                                                   controllers.FlashCardControllerSensei.deleteFlashCard(flashCardID: Integer)
+
+GET         /flashCard/:flashCardID/:id/:kind                                                                controllers.FlashCardControllerSensei.deleteFromFlashCard(kind: Integer, flashCardID: Integer, id: Integer)
+
+POST        /flashCard/:flashCardID/addStuff                                                                 controllers.FlashCardControllerSensei.addStuffToFlashcard(flashCardID: Integer)
+
+POST        /flashCard/new/:docID/:tagID                                                                     controllers.FlashCardControllerSensei.createFlashCard(docID: Integer, tagID: Integer)
+POST        /flashCard/:flashCardID/changeChapter/:chapterID                                                 controllers.FlashCardControllerSensei.changeChapter(flashCardID: Integer, chapterID: Integer)
+POST        /flashCard/:flashCardID/changeHeadline/:chapterID/:headlineID                                    controllers.FlashCardControllerSensei.changeHeadline(flashCardID: Integer, chapterID: Integer, headlineID: Integer)
+POST        /flashCard/:flashCardID/changeSubHeadline/:headlineID/:subHeadlineID                             controllers.FlashCardControllerSensei.changeSubHeadline(flashCardID: Integer,headlineID: Integer, subHeadlineID: Integer)
+
+POST        /flashcard/:flashcardID/addNewChapter                                                            controllers.FlashCardControllerSensei.addNewChapter(flashcardID: Integer)
+POST        /flashcard/:flashcardID/addNewHeadline/:chapterID                                                controllers.FlashCardControllerSensei.addNewHeadline(flashcardID: Integer, chapterID: Integer)
+POST        /flashcard/:flashcardID/addNewSubHeadline/:headlineID                                            controllers.FlashCardControllerSensei.addNewSubHeadline(flashcardID: Integer, headlineID: Integer)
+
+POST        /flashcard/:flashcardID/addContentToChapter/:chapterID                                           controllers.FlashCardControllerSensei.addNewContentToChapter(flashcardID: Integer, chapterID: Integer)
+POST        /flashcard/:flashcardID/addContentToHeadline/:headlineID                                         controllers.FlashCardControllerSensei.addNewContentToContentHeadline(flashcardID: Integer, headlineID: Integer)
+POST        /flashcard/:flashcardID/addContentToSubHeadline/:subHeadlineID                                   controllers.FlashCardControllerSensei.addNewContentToContentSubHeadline(flashcardID: Integer, subHeadlineID: Integer)
+
+GET         /flashcard/:flashcardID/changeContent/:typeID/:parentID/:contentID                               controllers.FlashCardControllerSensei.changeContentFlascardPage(flashcardID: Integer, contentID: Integer, parentID: Integer, typeID: Integer)
+POST        /flashcard/:flashcardID/changeContent/:typeID/:parentID/:contentID                               controllers.FlashCardControllerSensei.changeContent(flashcardID: Integer, contentID: Integer, parentID: Integer, typeID: Integer)
+
+
+
+GET         /documents/:id/version                                                                           controllers.VersionController.versionPage(id: Integer)
+GET         /documents/:docID/version/showCase/:typeOfVersion/:id                                            controllers.VersionController.showCaseVersion(id: Integer, typeOfVersion: Integer, docID: Integer)
+
+GET         /documents/:id/version/rollbackContent/:versionContentID                                         controllers.VersionController.rollbackContentPublic(versionContentID: Integer, id: Integer)
+GET         /documents/:id/version/rollbackChapter/:versionChapterID                                         controllers.VersionController.rollbackChapterPublic(versionChapterID: Integer, id: Integer)
+GET         /documents/:id/version/rollbackHeadline/:versionHeadlineID                                       controllers.VersionController.rollbackHeadlinePublic(versionHeadlineID: Integer, id: Integer)
+GET         /documents/:id/version/rollbackSubHeadline/:versionSubHeadlineID                                 controllers.VersionController.rollbackSubHeadlinePublic(versionSubHeadlineID: Integer, id: Integer)
+
+GET         /documents/:docID/reference/:refID                                                               controllers.ContentController.deleteReference(refID: Integer, docID: Integer )
+GET         /documents/:docID/reference/addReference/:contentID                                              controllers.ContentController.addReferencePage(contentID: Integer, docID: Integer)
+POST        /documents/:docID/reference/addReference/:contentID/:referencedContentID/:referencedDocID        controllers.ContentController.addReference(contentID: Integer, docID: Integer, referencedContentID: Integer, referencedDocID: Integer)
+
+GET         /documents/:docID/suggestion                                                                     controllers.SuggestionController.documentSuggestionPage(docID: Integer)
+GET         /documents/:docID/suggestion/accept/:suggestionID                                                controllers.SuggestionController.acceptSuggestion(suggestionID: Integer, docID: Integer)
+GET         /documents/:docID/suggestion/decline/:suggestionID                                               controllers.SuggestionController.declineSuggestion(suggestionID: Integer, docID: Integer)
+GET         /documents/:docID/suggestion/declineALL                                                          controllers.SuggestionController.declineALLSuggestions(docID: Integer)
+GET         /documents/:docID/visibility                                                                     controllers.DocumentControllerSama.changeVisibility(docID: Integer)
+
+POST        /suggestContent/:flashCardContentID/:parentOfSuggestionKind/:parentOfSuggestionID                controllers.SuggestionController.suggestContent(flashCardContentID: Integer, parentOfSuggestionKind: Integer, parentOfSuggestionID: Integer)
+
+GET         /token/check/:kind/:id/:userEmail                                                                controllers.Security.TokenController.publicCheckToken(kind: Integer, id: Integer, userEmail: String)
+GET         /token/delete/:kind/:id/:userEmail                                                               controllers.Security.TokenController.publicDeleteToken(kind: Integer, id: Integer, userEmail: String)
+
+GET         /public/uploads/:fileName                                                                        controllers.ServeImageController.at(fileName)
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                                                                                    controllers.Assets.at(path="/public", file)
+

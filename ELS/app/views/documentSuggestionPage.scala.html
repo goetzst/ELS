@@ -1,0 +1,125 @@
+@(chapters: java.util.List[ChapterChan])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(suggestionsToChapter: java.util.HashMap[Integer, java.util.List[Suggestion]])(suggestionsToHeadline: java.util.HashMap[Integer, java.util.List[Suggestion]])(suggestionsToSubHeadline: java.util.HashMap[Integer, java.util.List[Suggestion]])(document: Document)(email: java.lang.String)(role: Integer)
+
+
+@mainFrame("Suggestion")(email)(role){
+
+    @mainPageNavigation("documents")
+
+
+    <h1>@document.getDocumentName</h1>
+
+    @editDocumentPage("suggestion")(document.getDocumentID)
+
+    <h2>Suggestions</h2>
+
+    <a data-toggle="modal" data-target="#confirmDeletAllSuggestions" class="btn btn-primary">
+        <!--<span data-toggle="tooltip" title="Decline all Suggestions" class="glyphicon glyphicon-trash" aria-hidden="true"></span>-->
+        Decline all Suggestions
+    </a>
+
+
+    <!-- Modal - Confirm Delete of all Suggestions-->
+    <div class="modal fade" id="confirmDeletAllSuggestions" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Decline all suggestions</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure that you want to decline all Suggestions?</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="@routes.SuggestionController.declineALLSuggestions(document.getDocumentID)" class="btn btn-primary">Ok</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @for(chapter: models.ChapterChan <- chapters){
+        <h3>@chapter.getTitle</h3>
+
+        @if(suggestionsToChapter.get(chapter.getChapterID).size==0){
+            <p><i>no suggestions</i></p>
+        }else{
+            @for(suggestionChapter: Suggestion <- suggestionsToChapter.get(chapter.getChapterID)){
+                @Html(suggestionChapter.getContent)
+
+                <a class="btn btn-primary" href="@routes.SuggestionController.acceptSuggestion(suggestionChapter.getId, document.getDocumentID)">Accept</a>
+                <a class="btn btn-default" href="@routes.SuggestionController.declineSuggestion(suggestionChapter.getId, document.getDocumentID)">Decline</a>
+                <div style="margin-bottom: 20px;"></div>
+            }
+        }
+
+
+        @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)){
+            <h4>@headline.getTitle</h4>
+
+            @if(suggestionsToHeadline.get(headline.getcHeadLineID).size==0){
+                <p><i>no suggestions</i></p>
+            }else{
+                @for(suggestionHeadline: Suggestion <- suggestionsToHeadline.get(headline.getcHeadLineID())){
+                    @Html(suggestionHeadline.getContent)
+
+                    <a class="btn btn-primary" href="@routes.SuggestionController.acceptSuggestion(suggestionHeadline.getId, document.getDocumentID)">Accept</a>
+                    <a class="btn btn-default" href="@routes.SuggestionController.declineSuggestion(suggestionHeadline.getId, document.getDocumentID)">Decline</a>
+                    <div style="margin-bottom: 20px;"></div>
+                }
+            }
+
+            @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID())) {
+                <h5>@subHeadline.getTitle</h5>
+
+                @if(suggestionsToSubHeadline.get(subHeadline.getcSubHeadLineID()).size == 0) {
+                    <p><i>no suggestions</i></p>
+                }else{
+                    @for(suggestionSubHeadline: Suggestion <- suggestionsToSubHeadline.get(subHeadline.getcSubHeadLineID())) {
+                        @Html(suggestionSubHeadline.getContent)
+
+                        <a class="btn btn-primary" href="@routes.SuggestionController.acceptSuggestion(suggestionSubHeadline.getId, document.getDocumentID)">Accept</a>
+                        <a class="btn btn-default" href="@routes.SuggestionController.declineSuggestion(suggestionSubHeadline.getId, document.getDocumentID)">Decline</a>
+                        <div style="margin-bottom: 20px;"></div>
+
+                    }
+                }
+            }
+        }
+    }
+
+
+    <!-- Set different ID because two editors can have (in some cases) same id -->
+    <script>
+        var editors = document.getElementsByClassName('editor');
+
+        for( var i=1; i<editors.length; i++){
+            //set new id to div
+            var random = Math.random().toString(36).substring(7);
+            editors[i].setAttribute('id','editor'+random);
+
+            //get new editor und set values
+            var editor = ace.edit('editor'+random);
+            editor.setTheme("ace/theme/chrome");
+            editor.resize();
+            editor.setReadOnly(true);
+            editor.session.setNewLineMode("windows");
+
+            //change Javascript method
+            var scriptContent = editors[i].nextSibling.innerText;
+            var oldId = scriptContent.substring( scriptContent.indexOf('ace.edit(')+10 , scriptContent.indexOf('; editor.setTheme(' )-2 );
+            editors[i].nextSibling.innerText = editors[i].nextSibling.innerText.replace(oldId, 'editor'+random);
+
+            //set right language
+            var language = scriptContent.substring( scriptContent.indexOf('editor.getSession().setMode("ace/mode/')+38 ,
+                          scriptContent.indexOf('); editor.resize(); editor.setReadOnly')-1  );
+            editor.getSession().setMode('ace/mode/'+language);
+        }
+    </script>
+
+
+
+}
+
+
+

@@ -1,0 +1,41 @@
+@(documentID: Integer)(contentID: Integer)(commentID: Integer)(subCommentID: Integer)(toEdit: Boolean)
+
+
+<!-- Delete Subcomment -->
+<span data-toggle="tooltip" data-placement="top" title="Delete Subcomment">
+    <a data-toggle="modal" data-target="#delSubComment@subCommentID" class="btn-distance cursorPointer" onclick="checkTokenForSubCommentDelete('@subCommentID', this);">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        Delete
+    </a>
+</span>
+
+<!-- Modal - Confirm Delete of SubComment-->
+<div class="modal fade" id="delSubComment@subCommentID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Delete Subcomment</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure that you want to delete the Subcomment?</p>
+            </div>
+            <div class="modal-footer">
+                @if(!toEdit){
+                    <a href="@routes.CommentController.deleteSubComment(subCommentID, commentID, contentID, documentID, 0)" class="btn btn-primary" onclick="deleteTokenForSubCommentDelete('@subCommentID');" id="confirmDeleteSubCommentButton@subCommentID"> Ok </a>
+                }else{
+                    <a href="@routes.CommentController.deleteSubComment(subCommentID, commentID, contentID, documentID, 1)" class="btn btn-primary" onclick="deleteTokenForSubCommentDelete('@subCommentID');" id="confirmDeleteSubCommentButton@subCommentID"> Ok </a>
+                }
+                <button type="button" class="btn btn-default" data-dismiss="modal"> Close </button><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('#delSubComment@subCommentID').on('hidden.bs.modal', function () {
+        deleteTokenForSubCommentDelete('@subCommentID')
+    })
+</script>

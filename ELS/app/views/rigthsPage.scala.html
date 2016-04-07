@@ -1,0 +1,39 @@
+@(users: java.util.List[User])(self: String)(role: Integer)
+
+@mainFrame("Rights")(self)(role) {
+
+    @mainPageNavigation("rights")
+
+    <h2>List of registered Users</h2>
+
+    <table class="table table-condensed">
+        <tr>
+            <th>Surname</th>
+            <th>First Name</th>
+            <th>Role</th>
+        </tr>
+        @for(user <- users) {
+            <tr>
+                <td>@user.getSurName</td>
+                <td>@user.getFirstName</td>
+                <td>
+                    @if(user.getEmail != self) {
+                        <div class="dropdown">
+                                <!-- Link or button to toggle dropdown -->
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">@if(user.getRole == 0) {Admin} @if(user.getRole == 1) {Dozent} @if(user.getRole == 2) {Student} <b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                <li><a tabindex="-1" href="@routes.AdminController.changeRight(user.getEmail, 2)">
+                                    Student</a></li>
+                                <li><a tabindex="-1" href="@routes.AdminController.changeRight(user.getEmail, 1)">
+                                    Dozent</a></li>
+                                <li><a tabindex="-1" href="@routes.AdminController.changeRight(user.getEmail, 0)">
+                                    Admin</a></li>
+                            </ul>
+                        </div>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+
+}

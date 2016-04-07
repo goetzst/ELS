@@ -1,0 +1,163 @@
+@(docID: Integer)(contentID: Integer)(documents: java.util.List[Document])(chapters: java.util.HashMap[Integer, java.util.List[ChapterChan]])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(contentToChapter: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToHeadline: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToSubHeadline: java.util.HashMap[Integer, java.util.List[models.Content]])(email: String)(role: Integer)
+
+@mainFrame("Add new Reference")(email)(role){
+    @for(document <- documents){
+        <div class="list-group">
+            <a data-toggle="collapse" data-target="#document@document.getDocumentID" class="list-group-item cursorPointer">
+            @document.getDocumentName
+            </a>
+
+            <div class="collapse" id="document@document.getDocumentID">
+            @for(chapter <- chapters.get(document.getDocumentID)){
+                <a data-toggle="collapse" data-target="#chapter@chapter.getChapterID" class="list-group-item cursorPointer">
+                    <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>@chapter.getTitle
+                </a>
+                <div class="collapse" id="chapter@chapter.getChapterID">
+                @for(content <- contentToChapter.get(chapter.getChapterID)){
+                    <a href="#addReference@(document.getDocumentID)To@(content.getContentID)" data-toggle="modal" class="list-group-item cursorPointer">
+                        @if(content.getType==0){
+                            @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                            }else{
+                                @content.getContent.replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                            }
+                        }
+                        @if(content.getType==1){
+                            Image
+                        }
+                        @if(content.getType==2){
+                            Code
+                        }
+                    </a>
+
+                        <!-- Modal - Add Reference -->
+                    <div class="modal fade" id="addReference@(document.getDocumentID)To@(content.getContentID)" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Add Reference</h4>
+                                </div>
+                                <form method="post" action="@routes.ContentController.addReference(contentID, docID, content.getContentID, document.getDocumentID)" >
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="referenceName">Name the Reference</label>
+                                            <input type="text" name="referenceName" class="form-control" id="referenceName" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="submit" class="btn btn-primary" value="Create" class="btn btn-primary">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                    @for(headline <- headlines.get(chapter.getChapterID)){
+                        <a data-toggle="collapse" data-target="#headline@headline.getcHeadLineID()" class="list-group-item cursorPointer">
+                            <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>@headline.getTitle
+                        </a>
+                        <div class="collapse" id="headline@headline.getcHeadLineID()">
+                        @for(contentH <- contentToHeadline.get(headline.getcHeadLineID())){
+                            <a href="#addReference@(document.getDocumentID)To@(contentH.getContentID)" data-toggle="modal" class="list-group-item cursorPointer">
+                                @if(contentH.getType==0){
+                                    @if(contentH.getContent.length() > 20 && (contentH.getContent.indexOf(' ', 20)!=(-1)) ){
+                                        @contentH.getContent.substring(3,contentH.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                    }else{
+                                        @contentH.getContent.replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                    }
+                                }
+                                @if(contentH.getType==1){
+                                    Image
+                                }
+                                @if(contentH.getType==2){
+                                    Code
+                                }
+                            </a>
+
+                                <!-- Modal - Add Reference -->
+                            <div class="modal fade" id="addReference@(document.getDocumentID)To@(contentH.getContentID)" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title" id="myModalLabel">Add Reference</h4>
+                                        </div>
+                                        <form method="post" action="@routes.ContentController.addReference(contentID, docID, contentH.getContentID, document.getDocumentID)" >
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label for="referenceName">Name the Reference</label>
+                                                    <input type="text" name="referenceName" class="form-control" id="referenceName" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input type="submit" class="btn btn-primary" value="Create" class="btn btn-primary">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                            @for(subheadline <- subHeadlines.get(headline.getcHeadLineID())){
+                                <a data-toggle="collapse" data-target="#subHeadline@subheadline.getcSubHeadLineID()" class="list-group-item cursorPointer">
+                                    <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>@subheadline.getTitle
+                                </a>
+                                <div class="collapse" id="subHeadline@subheadline.getCheadlineID">
+                                @for(contentS <- contentToSubHeadline.get(subheadline.getcSubHeadLineID())){
+                                    <a href="#addReference@(document.getDocumentID)To@(contentS.getContentID)" data-toggle="modal" class="list-group-item cursorPointer">
+                                        @if(contentS.getType==0){
+                                            @if(contentS.getContent.length() > 20 && (contentS.getContent.indexOf(' ', 20)!=(-1)) ){
+                                                @contentS.getContent.substring(3,contentS.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                            }else{
+                                                @contentS.getContent.replaceAll("\\<.*?\\>", "").replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                            }
+                                        }
+                                        @if(contentS.getType==1){
+                                            Image
+                                        }
+                                        @if(contentS.getType==2){
+                                            Code
+                                        }
+                                    </a>
+
+                                        <!-- Modal - Add Reference -->
+                                    <div class="modal fade" id="addReference@(document.getDocumentID)To@(contentS.getContentID)" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title" id="myModalLabel">Add Reference</h4>
+                                                </div>
+                                                <form method="post" action="@routes.ContentController.addReference(contentID, docID, contentS.getContentID, document.getDocumentID)" >
+                                                    <div class="modal-body">
+                                                        <div class="form-group">
+                                                            <label for="referenceName">Name the Reference</label>
+                                                            <input type="text" name="referenceName" class="form-control" id="referenceName" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <input type="submit" class="btn btn-primary" value="Create" class="btn btn-primary">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    </div>
+
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+            </div>
+        </div>
+    }
+
+    <a class="btn btn-primary" href="@routes.DocumentControllerSama.documentPage(docID, true)">Cancel</a>
+}

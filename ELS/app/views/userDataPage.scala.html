@@ -1,0 +1,81 @@
+@(form: Form[UserData])(user: User)(email: String)(role: Integer)
+    @import helper._
+@import helper.twitterBootstrap._
+
+    @mainFrame("Change User")(email)(role) {
+    <div id="idiv" class="row">
+
+        <script type="text/javascript">
+        function validate () {
+        var pass = document.getElementById('password').value;
+        var passValidate = document.getElementById('inputPasswordVerify').value;
+
+        var warningEquality = document.getElementById('warningNotEqual');
+        warningEquality.innerHTML = '';
+
+        var warningShort = document.getElementById('warningTooShort');
+        warningShort.innerHtml = '';
+
+        if (pass.length < 6 && !pass.length == 0) {
+        warningShort.className = 'label label-danger';
+        warningShort.innerHTML = 'Password should be at least 6 Characters long!'
+        return false;
+        }
+        if (pass != passValidate) {
+        warningEquality.className = 'label label-danger';
+        warningEquality.innerHTML = 'Passwords do not match!';
+        return false;
+        }
+        }
+        </script>
+
+        @mainPageNavigation("main")
+
+        <div class="col-md-12">
+            <h1 align="center">User Data</h1>
+        </div>
+
+        <div class="col-md-3 col-md-offset-2">
+
+            <form class="form-horizontal" method="post" onsubmit="return validate()" action="@routes.UserDataController.changeUserData(user.getEmail())">
+                <div class="form-group">
+                    <h3 class="form-signin">Please fill out the form</h3>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputFirstName">Name</label>
+                    <input type="firstName" name="firstName" value="@user.getFirstName()" placeholder="@user.getFirstName()" id="firstName" class="form-control" disabled>
+                    <input name="firstName" value="@user.getFirstName()" placeholder="@user.getFirstName()" id="firstName" class="form-control" type="hidden">
+                </div>
+
+                <div class="form-group">
+                    <label for="inputSurname">Surname</label>
+                    <input type="surName" name="surName" value="@user.getSurName()" placeholder="@user.getSurName()" id="surName" class="form-control" disabled>
+                    <input name="surName" value="@user.getSurName()" placeholder="@user.getSurName()" id="surName" class="form-control" type="hidden">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPassword">New Password</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="New Password">
+                    <div id="warningTooShort"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputPasswordVerify">New Password</label>
+                    <input type="password" name="inputPasswordVerify" id="inputPasswordVerify" class="form-control" placeholder="New Password">
+                    <div id="warningTooShort"></div>
+                    <div id="warningNotEqual"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="oldPassword">Old Password</label>
+                    <input type="password" name="oldPassword" id="oldPassword" class="form-control" placeholder="Old Password" required>
+                </div>
+                <div class="form-group">
+                    <button id="bt1" type="submit" class="btn btn-primary">Apply changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

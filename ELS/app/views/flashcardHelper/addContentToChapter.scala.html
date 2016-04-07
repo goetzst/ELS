@@ -1,0 +1,257 @@
+@(flashcard: FlashCard)(chapter: ChapterChan)(contentToChapters: java.util.HashMap[Integer, java.util.List[models.Content]])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])
+
+
+<!--<a data-toggle="collapse" data-target="#chapterCollapse@chapter.getChapterID" onclick="setRadioButtonDefault('chapterRadio@(chapter.getChapterID)_1')" aria-expanded="false" aria-controls="collapseExample">
+    <span data-toggle="tooltip" title="Add new Content to the Chapter" class="glyphicon glyphicon-plus"></span>
+</a> -->
+
+
+<div class="collapse" id="chapterCollapse@chapter.getChapterID">
+    <div class="newContent">
+
+    <h4>Add new Content</h4>
+
+    <div class="form-group">
+        <label >Choose your content type </label></br>
+
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_1" value="text" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Text
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_2" value="image" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Image
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_3" value="code" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Code
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_4" value="newHeadline" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> New Headline
+        </label>
+    </div>
+
+
+    <div id="contentText_forChapter@chapter.getChapterID">
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewContentToChapter(flashcard.getFlashCardID, chapter.getChapterID)">
+
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="0" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputText"></label>
+                <textarea name="content" class="editTextArea" id="inputText" rows="6" cols="96"></textarea>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    <div id="contentImage_forChapter@chapter.getChapterID" hidden="hidden">
+        <form method="POST" action="@routes.FlashCardControllerSensei.addNewContentToChapter(flashcard.getFlashCardID, chapter.getChapterID)" enctype="multipart/form-data" onsubmit="return Validate(this, 'warning_Chapter@(chapter.getChapterID)');">
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="1" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpdload">Choose your file</label>
+                <input id="fileUpdload" type="file" name="picture" required>
+                <div id="warning_Chapter@(chapter.getChapterID)"></div>
+            </div>
+
+
+            <input type="submit" value="Ok" class="btn btn-primary">
+
+        </form>
+    </div>
+
+    <div id="contentCode_forChapter@chapter.getChapterID" hidden="hidden">
+
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewContentToChapter(flashcard.getFlashCardID, chapter.getChapterID)" enctype="application/x-www-form-urlencoded"  >
+
+            <!-- <div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div> -->
+
+            <input name="type" value="2" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="mode_Chapter@(chapter.getChapterID)">Select Language</label>
+                <select id="mode_Chapter@(chapter.getChapterID)" class="form-control" onchange="updateLanguageOfCodeEditor('Chapter@chapter.getChapterID');">
+                    <option value="java">Java</option>
+                    <option value="javascript" selected>Javascript</option>
+                    <option value="haskell">Haskell</option>
+                </select>
+
+                <textarea name="content" id="inputCode_Chapter@(chapter.getChapterID)" hidden></textarea>
+
+                <div id="editor_Chapter@(chapter.getChapterID)" class="editor"></div>
+
+            </div>
+
+            <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode_Chapter@(chapter.getChapterID)()">
+
+        </form>
+
+
+        <script>
+        var editor = ace.edit("editor_Chapter@(chapter.getChapterID)");
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/java");
+    </script>
+
+        <script>
+                function setCode_Chapter@(chapter.getChapterID)(){
+                    var editor = ace.edit("editor_Chapter@(chapter.getChapterID)")
+                    editor.session.setNewLineMode("windows");
+
+                    var content = editor.getSession().getValue();
+                    var random = Math.random().toString(36).substring(7);
+
+                    var e = document.getElementById("mode_Chapter@(chapter.getChapterID)");
+                    var language = e.options[e.selectedIndex].value;
+
+                    var mainDiv = document.createElement('div');
+                    mainDiv.setAttribute("id", "editor"+random);
+                    mainDiv.setAttribute("class", "editor");
+                    mainDiv.setAttribute("style", 'height: '+ (editor.session.getLength()*14+2) + 'px' );
+                    mainDiv.innerHTML = content+"";
+
+                    var s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    var code = 'var editor = ace.edit("editor' + random + '"); ' +
+                                'editor.setTheme("ace/theme/chrome"); ' +
+                                'editor.getSession().setMode("ace/mode/'+language+'"); ' +
+                                'editor.resize(); ' +
+                                'editor.setReadOnly(true); ' +
+                                'editor.session.setNewLineMode("windows");';
+                    try {
+                        s.appendChild(document.createTextNode(code));
+                        document.body.appendChild(s);
+                    } catch (e) {
+                        s.text = code;
+                        document.body.appendChild(s);
+                    }
+
+                    var outherDiv = document.createElement('div');
+                    outherDiv.appendChild(mainDiv);
+                    outherDiv.appendChild(s);
+
+                    document.getElementById('inputCode_Chapter@(chapter.getChapterID)').value = outherDiv.innerHTML;
+                };
+            </script>
+    </div>
+
+    <div id="contentNewHeadline_forChapter@chapter.getChapterID" hidden="hidden">
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewHeadline(flashcard.getFlashCardID, chapter.getChapterID)">
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)) {
+                        <option value="@headline.getSequence"> @headline.getTitle </option>
+                    }
+                <option value="@(1+headlines.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newHeadline">New Headline Name</label>
+                <input name="title" id="newHeadline" placeholder="Headline"  class="form-control" required>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    </div>
+
+</div>
+
+
+
+
+

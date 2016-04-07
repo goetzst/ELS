@@ -1,0 +1,14 @@
+@(s: String)
+
+<ul class="nav nav-tabs hidden-print">
+
+    <li role="presentation" @if(s.equals("main")) {class="active"} ><a href="@routes.MainPageController.mainPage()" >Main</a></li>
+    <li role="presentation" @if(s.equals("allDocuments")) {class="active"} ><a href="@routes.MainPageController.documentListPage()">All Documents</a></li>
+    <li role="presentation" @if(s.equals("flashcard")) {class="active"} ><a href="@routes.FlashCardControllerSensei.flashCardsPage()">Flashcards</a></li>
+    <li role="presentation" @if(s.equals("tags")) {class="active"} ><a href="@routes.TagController.tagsPage()">Tags</a></li>
+    @if(Integer.parseInt(play.mvc.Http.Context.current().session().get("role")) == 0) {
+        <li role="presentation" @if(s.equals("facSub")) {class="active"} ><a href="@routes.FacultySubjectController.editFacultySubjectPage()">Faculties and Subjects</a></li>
+        <li role="presentation" @if(s.equals("rights")) {class="active"} ><a href="@routes.AdminController.rightsPage()">Rights</a></li>
+    }
+
+</ul>

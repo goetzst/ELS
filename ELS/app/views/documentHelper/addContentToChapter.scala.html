@@ -1,0 +1,225 @@
+@(chapter: ChapterChan)(contentToChapters: java.util.HashMap[Integer, java.util.List[models.Content]])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])
+
+
+<!--<a data-toggle="collapse" data-target="#chapterCollapse@chapter.getChapterID" onclick="setRadioButtonDefault('chapterRadio@(chapter.getChapterID)_1')" aria-expanded="false" aria-controls="collapseExample">
+    <span data-toggle="tooltip" title="Add new Content to the Chapter" class="glyphicon glyphicon-plus"></span>
+</a> -->
+
+
+<div class="collapse" id="chapterCollapse@chapter.getChapterID">
+    <div class="newContent">
+
+    <h4>Add new Content</h4>
+
+    <div class="form-group">
+        <label >Choose your content type </label></br>
+
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_1" value="text" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Text
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_2" value="image" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Image
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_3" value="code" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> Code
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="chapterRadio@(chapter.getChapterID)_4" value="newHeadline" onChange="setTypeOfContentToAddVisible(this, 'Chapter@chapter.getChapterID');"> New Headline
+        </label>
+    </div>
+
+
+    <div id="contentText_forChapter@chapter.getChapterID">
+        <form method="post" action="@routes.ContentController.addContentToChapter(chapter.getChapterID)">
+
+
+            <input name="type" value="0" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputText"></label>
+                <textarea name="content" class="editTextArea" id="inputText" rows="6" cols="96"></textarea>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    <div id="contentImage_forChapter@chapter.getChapterID" hidden="hidden">
+        <form method="POST" action="@routes.ContentController.addContentToChapter(chapter.getChapterID)" enctype="multipart/form-data" onsubmit="return Validate(this, 'warning_Chapter@(chapter.getChapterID)');">
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="1" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpdload">Choose your file</label>
+                <input id="fileUpdload" type="file" name="picture" required>
+                <div id="warning_Chapter@(chapter.getChapterID)"></div>
+            </div>
+
+
+            <input type="submit" value="Ok" class="btn btn-primary">
+
+        </form>
+    </div>
+
+    <div id="contentCode_forChapter@chapter.getChapterID" hidden="hidden">
+
+        <form method="post" action="@routes.ContentController.addContentToChapter(chapter.getChapterID)" enctype="application/x-www-form-urlencoded"  >
+
+            <!-- <div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div> -->
+
+            <input name="type" value="2" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentToChapters.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="mode_Chapter@(chapter.getChapterID)">Select Language</label>
+                <select id="mode_Chapter@(chapter.getChapterID)" class="form-control" onchange="updateLanguageOfCodeEditor('Chapter@chapter.getChapterID');">
+                    <option value="java">Java</option>
+                    <option value="javascript" selected>Javascript</option>
+                    <option value="haskell">Haskell</option>
+                </select>
+
+                <textarea name="content" id="inputCode_Chapter@(chapter.getChapterID)" hidden></textarea>
+
+                <div id="editor_Chapter@(chapter.getChapterID)" class="editor"></div>
+
+            </div>
+
+            <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode('Chapter@chapter.getChapterID');">
+
+        </form>
+
+
+        <script>
+        var editor = ace.edit("editor_Chapter@(chapter.getChapterID)");
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/java");
+        updateLanguageOfCodeEditor('Chapter@chapter.getChapterID');
+        </script>
+
+
+    </div>
+
+    <div id="contentNewHeadline_forChapter@chapter.getChapterID" hidden="hidden">
+        <form method="post" action="@routes.ContentController.addContentHeadline(chapter.getChapterID)">
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)) {
+                        <option value="@headline.getSequence"> @headline.getTitle </option>
+                    }
+                <option value="@(1+headlines.get(chapter.getChapterID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newHeadline">New Headline Name</label>
+                <input name="title" id="newHeadline" placeholder="Headline"  class="form-control" required>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+

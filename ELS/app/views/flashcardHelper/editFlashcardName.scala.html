@@ -1,0 +1,28 @@
+@(flashcard: FlashCard)
+
+<a class="btn btn-primary" data-toggle="modal" data-target="#editFlashCardName"> Edit Name </a>
+
+
+<!-- Modal - Edit FlashCard Name-->
+<div class="modal fade" id="editFlashCardName" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Change FlashCard Name</h4>
+            </div>
+            <form method="POST" action="@routes.FlashCardControllerSensei.changeFlashCardName(flashcard.getFlashCardID)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="newName">Please enter new name for the FlashCard</label>
+                        <input name="newFlashCardName" class="form-control" id="newName" type="text" value="@flashcard.getFlashCardName" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Ok">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

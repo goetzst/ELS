@@ -1,0 +1,38 @@
+@(documentID: Integer)(contentID: Integer)(commentID: Integer)(toEdit: Boolean)
+
+<!-- Delete Comment -->
+<span data-toggle="tooltip" data-placement="top" title="Delete Comment">
+    <a data-toggle="modal" data-target="#delComment@commentID" class="btn-distance cursorPointer" onclick="checkTokenForCommentDelete('@commentID', this);">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        Delete
+    </a>
+</span>
+
+<!-- Modal - Confirm Delete of Comment-->
+<div class="modal fade" id="delComment@commentID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete Comment</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure that you want to delete the Comment including all Subcomments?</p>
+            </div>
+            <div class="modal-footer">
+                @if(!toEdit){
+                    <a href="@routes.CommentController.deleteComment(commentID, contentID, documentID, 0)" class="btn btn-primary" onclick="deleteTokenForCommentDelete('@commentID');" id="confirmDeleteCommentButton@commentID" >Ok</a>
+                }else{
+                    <a href="@routes.CommentController.deleteComment(commentID, contentID, documentID, 1)" class="btn btn-primary" onclick="deleteTokenForCommentDelete('@commentID');" id="confirmDeleteCommentButton@commentID">Ok</a>
+                }
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#delComment@commentID').on('hidden.bs.modal', function () {
+        deleteTokenForCommentDelete('@commentID')
+    })
+</script>

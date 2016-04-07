@@ -1,0 +1,45 @@
+@(subHeadline: ContentSubHeadline)(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])
+
+<a data-toggle="modal" href="#editSubHeadline@subHeadline.getcSubHeadLineID" aria-expanded="false" aria-controls="modalExample">
+    <span data-toggle="tooltip" title="Edit this SubHeadline" class="glyphicon glyphicon-pencil"></span>
+</a>
+
+
+<!-- Modal - Edit Headline -->
+<div class="modal fade" id="editSubHeadline@subHeadline.getcSubHeadLineID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >Edit SubHeadline</h4>
+            </div>
+            <form method="POST" action="@routes.ContentController.changeContentSubHeadline(subHeadline.getcSubHeadLineID, subHeadline.getCheadlineID)">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="newName">Please enter new name for the SubHeadline</label>
+                        <input name="title" class="form-control" id="newName" type="text" value="@subHeadline.getTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="insertBefore">Insert before</label>
+                        <select class="form-control"  name="sequence" id="insertBefore">
+                            @for(subHeadlineTemp: ContentSubHeadline <- subHeadlines.get(subHeadline.getCheadlineID)) {
+                                <option value="@subHeadlineTemp.getSequence" @if(subHeadlineTemp.getSequence==subHeadline.getSequence){selected}>@subHeadlineTemp.getTitle</option> <br/>
+                            }
+                            <option value="@(1+ subHeadlines.get(subHeadline.getCheadlineID).size)">at the end</option> <br/>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" type="submit" value="Ok">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

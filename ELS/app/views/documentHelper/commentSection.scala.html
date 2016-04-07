@@ -1,0 +1,188 @@
+@(comments: java.util.List[Comment])(subComments: java.util.HashMap[Integer, java.util.List[SubComment]])(content: models.Content)(documentID: Integer)(tags: List[Tag])(commentTags: java.util.HashMap[Integer, java.util.List[Tag]])(subCommentTags: java.util.HashMap[Integer, java.util.List[Tag]])(email: String)(role: Integer)(toEdit: Boolean)(moderators: java.util.List[User])(dozent: String)
+
+
+<div class="commentButton hidden-print" style="margin-top: 0px; margin-bottom: 18px;">
+    <a class="btn btn-default btn-sm hidden-print" data-toggle="collapse" data-target="#comment@content.getContentID" aria-expanded="false" aria-controls="collapseExample">
+        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Show comments
+    </a>
+</div>
+
+<!--- Chapter Comments --->
+<div class="collapse" id="comment@content.getContentID" style="margin-top: 6px; margin-button: 10px;">
+
+    @for(comment: Comment <- comments) {
+
+    <article class="row">
+
+        <div class="col-md-12 col-md-offset-0 col-sm-10">
+
+            <div class="comment ">
+                <div class="headerComment">
+                        <!-- Delete Comment -->
+                        @if(role==0 ||  toEdit || email.equals(comment.getUserEmail) ) {
+                            @documentHelper.deleteComment(documentID)(content.getContentID)(comment.getCommentID)(toEdit)
+                        }
+                        <!-- Edit Comment -->
+                        @if(role==0 ||  toEdit || email.equals(comment.getUserEmail) ) {
+                            @documentHelper.editComment(documentID)(content.getContentID)(comment)(toEdit)
+                        }
+
+                    <span data-toggle="tooltip" data-placement="top" title="Replay">
+                        <a data-toggle="collapse" data-target="#newSubcomment@comment.getCommentID" aria-expanded="false" class="btn-distance cursorPointer"><span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                            Reply
+                        </a>
+                    </span>
+
+                    <!-- Tag the Comment --->
+                    @if(!toEdit){
+                    <span class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b> Tag with </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            @for(tag <- tags){
+                                @if(tag.isGlobal){
+                                    @if((role == 0 || email.equals(dozent)  || (moderators.map((u: User) => u.getEmail)).contains(email)) && tag.getDocID == documentID){
+                                        <li role="presentation">
+                                            <form method="post" action="@routes.TagController.addTag(1, comment.getCommentID, tag.getTagID, documentID)">
+                                                <button role="menuitem" tabindex="-1" class="btn btn-link" type="submit">global: @tag.getTagName</button>
+                                            </form>
+                                        </li>
+                                    }
+                                }else{
+                                    <li role="presentation">
+                                        <form method="post" action="@routes.TagController.addTag(1, comment.getCommentID, tag.getTagID, documentID)">
+                                            <button role="menuitem" tabindex="-1" class="btn btn-link" type="submit">@tag.getTagName</button>
+                                        </form>
+                                    </li>
+                                }
+                            }
+                        <li role="presentation"><form><a class="btn btn-link" data-toggle="modal" data-target="#createNewTagKIND1AndID@comment.getCommentID" aria-expanded="false" aria-controls="collapseExample"><i>create new Tag</i></a></form></li>
+                        </ul>
+                    </span>
+
+                        <!-- kind of class on which tag will be added 0 := chapter, 1 := comment, 2 := subComment 3:= headline 4:= subHeadline -->
+                        @documentHelper.createTagAndAddToKind(documentID)(comment.getCommentID)(1)(moderators)(dozent)(email)(role)
+
+                    }
+
+                </div>
+
+                <div class="commentBody">
+
+                    <i class="fa fa-user"><small><p style="color: #337AB7">@comment.getUserEmail</p></small></i>
+                    <p>@comment.getContent</p>
+
+                    @if(!toEdit){
+                        @for(tag: Tag <- commentTags.get(comment.getCommentID)) {
+                            @if(tag.isGlobal){
+                                @if(role == 0 || email.equals(dozent)  || (moderators.map((u: User) => u.getEmail)).contains(email)){
+                                    <small>
+                                        <a href="@routes.TagController.deleteCommentTag(tag.getTagID, comment.getCommentID, 1)" data-toggle="tooltip" title="Delete Tag from Comment"><span class="glyphicon glyphicon-trash"></span></a>
+                                    </small>
+                                }
+                                <small class="text-danger"><i>@tag.getTagName</i></small>
+                            }else{
+                                <small>
+                                    <a href="@routes.TagController.deleteCommentTag(tag.getTagID, comment.getCommentID, 1)" data-toggle="tooltip" title="Delete Tag from Comment"><span class="glyphicon glyphicon-trash"></span></a>
+                                </small>
+                                <small class="hidden-print"><i>@tag.getTagName</i></small>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </article>
+
+
+    @for(subcomment: SubComment <- subComments.get(comment.getCommentID)) {
+
+    <article class="row">
+        <div class="col-md-12 col-md-offset-0 col-sm-10">
+            <div class="comment subcomment">
+
+                <div class="headerComment">
+                    @if(role==0 ||  toEdit || email.equals(subcomment.getUserEmail) ) {
+                        @documentHelper.deleteSubComment(documentID)(content.getContentID)(comment.getCommentID)(subcomment.getSubCommentID)(toEdit)
+                    }
+
+                    @if(role==0 ||  toEdit || email.equals(subcomment.getUserEmail) ) {
+                        @documentHelper.editSubComment(documentID)(content.getContentID)(comment.getCommentID)(subcomment)(toEdit)
+                    }
+
+                    <!-- Tag the Subcomment --->
+                    @if(!toEdit){
+                        <span class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b> Tag with </a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                @for(tag <- tags){
+                                    @if(tag.isGlobal){
+                                        @if((role == 0 || email.equals(dozent)  || (moderators.map((u: User) => u.getEmail)).contains(email)) && tag.getDocID == documentID){
+                                            <li>
+                                                <form method="post" action="@routes.TagController.addTag(2, subcomment.getSubCommentID, tag.getTagID, documentID)">
+                                                    <button class="btn btn-link" type="submit">global: @tag.getTagName</button>
+                                                </form>
+                                            </li>
+                                        }
+                                    }else{
+                                        <li>
+                                            <form method="post" action="@routes.TagController.addTag(2, subcomment.getSubCommentID, tag.getTagID, documentID)">
+                                                <button class="btn btn-link" type="submit">@tag.getTagName</button>
+                                            </form>
+                                        </li>
+                                    }
+                                }
+                                <li><form><a class="btn btn-link" data-toggle="modal" data-target="#createNewTagKIND2AndID@subcomment.getSubCommentID" aria-expanded="false" aria-controls="collapseExample"><i>create new Tag</i></a></form></li>
+                            </ul>
+                        </span>
+                        @documentHelper.createTagAndAddToKind(documentID)(subcomment.getSubCommentID)(2)(moderators)(dozent)(email)(role)
+                    }
+                </div>
+
+                <div class="commentBody">
+                    <i class="fa fa-user"><small><p style="color: #337AB7">@subcomment.getUserEmail</p></small></i>
+                    <p>@subcomment.getContent</p>
+
+                    @if(!toEdit) {
+                        @for(tag: Tag <- subCommentTags.get(subcomment.getSubCommentID)) {
+                            @if(tag.isGlobal){
+                                @if(role == 0 || email.equals(dozent)  || (moderators.map((u: User) => u.getEmail)).contains(email)){
+                                    <small>
+                                        <a href="@routes.TagController.deleteSubCommentTag(tag.getTagID, subcomment.getSubCommentID, 1)" data-toggle="tooltip" title="Delete Tag from Subcomment"><span class="glyphicon glyphicon-trash"></span></a>
+                                    </small>
+                                }
+                                <small class="text-danger"><i>@tag.getTagName</i></small>
+                            }else{
+                                <small>
+                                    <a href="@routes.TagController.deleteSubCommentTag(tag.getTagID, subcomment.getSubCommentID, 1)" data-toggle="tooltip" title="Delete Tag from Subcomment"><span class="glyphicon glyphicon-trash"></span></a>
+                                </small>
+                                <small class="hidden-print"><i>@tag.getTagName</i></small>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </article>
+
+    } <!-- End SubComment -->
+
+
+
+    <div class="collapse" id="newSubcomment@comment.getCommentID">
+        @documentHelper.newSubCommentPage(comment.getCommentID)(content.getContentID)(documentID)(toEdit)
+    </div>
+
+    } <!-- End comment -->
+
+    <div style="margin-top: 0px; margin-bottom: 20px;" id="addNewComment@content.getContentID">
+        <a data-toggle="collapse" data-target="#newComment@content.getContentID" aria-expanded="false" aria-controls="collapseExample" onclick="hideNewCommentButton('addNewComment@content.getContentID')" class="cursorPointer">
+            New Comment
+        </a>
+    </div>
+
+    <div class="collapse" id="newComment@content.getContentID" style="margin-top: 8px;">
+        @documentHelper.newCommentPage(content.getContentID)(documentID)(toEdit)
+    </div>
+
+
+</div> <!-- End comment section -->

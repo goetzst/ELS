@@ -1,0 +1,39 @@
+@(docID: Integer)(chapters: java.util.List[ChapterChan])
+
+<a data-toggle="modal" data-target="#addChapterToDoc@docID" class="btn btn-primary">Add new Chapter</a>
+
+<!-- Modal - Add new Chapter -->
+<div class="modal fade" id="addChapterToDoc@docID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >Add new Chapter</h4>
+            </div>
+            <form method="POST" action="@routes.ContentController.addChapter(docID)">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="newName">Please enter the name for the new Chapter</label>
+                        <input name="title" class="form-control" id="newName" type="text" placeholder="Enter name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="insertBefore">Insert before</label>
+                        <select class="form-control"  name="sequence" id="insertBefore">
+                            @for(chapterTemp: ChapterChan <- chapters) {
+                                <option value="@chapterTemp.getSequence">@chapterTemp.getTitle</option> <br/>
+                            }
+                            <option value="@(1+ chapters.size)" selected>at the end</option> <br/>
+                        </select>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" type="submit" value="Ok">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

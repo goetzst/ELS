@@ -1,0 +1,38 @@
+@(subHeadline: ContentSubHeadline)(contents: List[models.Content])(document: Document)(email: String)(role: Integer)
+@import java.time.Duration
+@import java.lang.Math
+
+@mainFrame("Version")(email)(role) {
+
+
+    @mainPageNavigation("main")
+
+   <header>
+       <h1>@document.getDocumentName</h1>
+   </header>
+
+    @editDocumentPage("version")(document.getDocumentID)
+
+    <h2>Old SubHeadline</h2>
+
+    <p>The old subheadline is display below. A rollback will set the subheadline to the version you see below. Please make sure that the parent headline element of this subheadline still exists. </p>
+
+    <div class="subHeadline">
+        <h3>@subHeadline.getTitle</h3>
+
+        @for(content: models.Content <- contents){
+            @if(Math.abs(Duration.between(subHeadline.getTimeStamp, content.getTimeStamp).toMillis)<200){
+                @Html(content.getContent)
+            }
+        }
+    </div>
+
+    <div class="form-group">
+        <a class="btn btn-primary" href="#confirmRollbackSubHeadline@subHeadline.getId" data-toggle="modal"> Rollback </a>
+        <a class="btn btn-default" href="@routes.VersionController.versionPage(document.getDocumentID)"> Back </a>
+    </div>
+
+    <!-- typeOfRollback 0:= chapter, 1:= headline, 2:= subHeadline 3:= content-->
+    @versionConfirmRollback(subHeadline.getId)(2)(document)
+
+}

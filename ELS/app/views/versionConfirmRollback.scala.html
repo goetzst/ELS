@@ -1,0 +1,35 @@
+@(elemID: Integer)(typeOfRollback: Integer)(document: Document)
+<!-- typeOfRollback 0:= chapter, 1:= headline, 2:= subHeadline 3:= content-->
+
+
+<!-- Modal - Confirm Rollback-->
+<div class="modal fade" id="confirmRollback@if(typeOfRollback==0){Chapter}@if(typeOfRollback==1){Headline}@if(typeOfRollback==2){SubHeadline}@if(typeOfRollback==3){Content}@elemID" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Confirm Rollback </h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure that you want to rollback?</p>
+            </div>
+            <div class="modal-footer">
+                @if(typeOfRollback==0){
+                    <a href="@routes.VersionController.rollbackChapterPublic(elemID, document.getDocumentID)" class="btn btn-primary">Ok</a>
+
+                }
+                @if(typeOfRollback==1){
+                    <a href="@routes.VersionController.rollbackHeadlinePublic(elemID, document.getDocumentID)" class="btn btn-primary">Ok</a>
+                }
+                @if(typeOfRollback==2){
+                    <a href="@routes.VersionController.rollbackSubHeadlinePublic(elemID, document.getDocumentID)" class="btn btn-primary">Ok</a>
+
+                }
+                @if(typeOfRollback==3){
+                    <a href="@routes.VersionController.rollbackContentPublic(elemID, document.getDocumentID)" class="btn btn-primary">Ok</a>
+                }
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

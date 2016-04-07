@@ -1,0 +1,59 @@
+@(headline: models.ContentHeadline)(contents: List[models.Content])(subHeadlines: java.util.List[ContentSubHeadline])(contentsToSubHeadline: java.util.HashMap[Integer, java.util.LinkedList[models.Content]])(document: Document)(email: String)(role: Integer)
+@import java.util
+@import java.time.Duration
+@import java.lang.Math
+
+
+
+@mainFrame("Version")(email)(role) {
+
+
+    @mainPageNavigation("main")
+
+   <header>
+       <h1>@document.getDocumentName</h1>
+   </header>
+
+    @editDocumentPage("version")(document.getDocumentID)
+
+    <h2>Old Headline</h2>
+
+    <p>The old headline is display below. A rollback will set the headline to the version you see below. Please make sure that the parent chapter of this headline still exists. </p>
+
+    <div class="headline">
+        <h3>@headline.getTitle</h3>
+
+        @for(content: models.Content <- contents){
+            @if(Math.abs(Duration.between(headline.getTimeStamp, content.getTimeStamp).toMillis)<200){
+                @Html(content.getContent)
+            }
+        }
+
+
+        @for(subHeadline: ContentSubHeadline <- subHeadlines){
+            @if(Math.abs(Duration.between(headline.getTimeStamp, subHeadline.getTimeStamp).toMillis)<200){
+                <div class="subHeadline" style="margin: 20px 0px">
+                    <h4>@subHeadline.getTitle</h4>
+
+                    @for(content: models.Content <- contentsToSubHeadline.getOrDefault(subHeadline.getcSubHeadLineID(), new java.util.LinkedList[models.Content]())){
+                        @if(Math.abs(Duration.between(subHeadline.getTimeStamp, content.getTimeStamp).toMillis)<200){
+                            @Html(content.getContent)
+                        }
+                    }
+                </div>
+            }
+
+
+        }
+    </div>
+
+    <div class="form-group">
+        <a class="btn btn-primary" href="#confirmRollbackHeadline@headline.getId" data-toggle="modal"> Rollback </a>
+        <a class="btn btn-default" href="@routes.VersionController.versionPage(document.getDocumentID)"> Back </a>
+    </div>
+
+
+    <!-- typeOfRollback 0:= chapter, 1:= headline, 2:= subHeadline 3:= content-->
+    @versionConfirmRollback(headline.getId)(1)(document)
+
+}

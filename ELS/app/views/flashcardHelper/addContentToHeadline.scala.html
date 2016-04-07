@@ -1,0 +1,261 @@
+@(flashcard: FlashCard)(headline: ContentHeadline)(contentsToHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])
+
+
+
+<!-- <a data-toggle="collapse" href="#headlineAddContent@headline.getcHeadLineID()" onclick="setRadioButtonDefault('headlineRadio@(headline.getcHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+    <span data-toggle="tooltip" title="Add new Content to this Headline" class="glyphicon glyphicon-plus"></span>
+</a> -->
+
+
+
+<div class="collapse" id="headlineAddContent@headline.getcHeadLineID()">
+    <div class="newContent">
+
+    <h4>Add new Content</h4>
+
+    <div class="form-group">
+        <label >Choose your content type </label></br>
+
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="headlineRadio@(headline.getcHeadLineID)_1" value="text" onChange="setTypeOfContentToAddVisible(this, 'Headline@headline.getcHeadLineID');"> Text
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="headlineRadio@(headline.getcHeadLineID)_2" value="image" onChange="setTypeOfContentToAddVisible(this, 'Headline@headline.getcHeadLineID');"> Image
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="headlineRadio@(headline.getcHeadLineID)_3" value="code" onChange="setTypeOfContentToAddVisible(this, 'Headline@headline.getcHeadLineID');"> Code
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="headlineRadio@(headline.getcHeadLineID)_4" value="newSubHeadline" onChange="setTypeOfContentToAddVisible(this, 'Headline@headline.getcHeadLineID');"> New SubHeadline
+        </label>
+    </div>
+
+
+    <div id="contentText_forHeadline@headline.getcHeadLineID">
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewContentToContentHeadline(flashcard.getFlashCardID, headline.getcHeadLineID())">
+
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="0" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content:  models.Content <- contentsToHeadlines.get(headline.getcHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentsToHeadlines.get(headline.getcHeadLineID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputText"></label>
+                <textarea name="content" class="editTextArea" id="inputText" rows="6" cols="96"></textarea>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    <div id="contentImage_forHeadline@headline.getcHeadLineID" hidden="hidden">
+        <form method="POST" action="@routes.FlashCardControllerSensei.addNewContentToContentHeadline(flashcard.getFlashCardID, headline.getcHeadLineID())" enctype="multipart/form-data" onsubmit="return Validate(this, 'warning_Headline@(headline.getcHeadLineID)');">
+            <!--<div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div>-->
+
+            <input name="type" value="1" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content:  models.Content <- contentsToHeadlines.get(headline.getcHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentsToHeadlines.get(headline.getcHeadLineID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpdload">Choose your file</label>
+                <input id="fileUpdload" type="file" name="picture" required>
+                <div id="warning_Headline@(headline.getcHeadLineID)"></div>
+            </div>
+
+
+            <input type="submit" value="Ok" class="btn btn-primary">
+
+        </form>
+    </div>
+
+    <div id="contentCode_forHeadline@headline.getcHeadLineID" hidden="hidden">
+
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewContentToContentHeadline(flashcard.getFlashCardID, headline.getcHeadLineID())" enctype="application/x-www-form-urlencoded"  >
+
+            <!-- <div class="form-group">
+                <label for="headline">Headline</label>
+                <input name="headline" id="headline" placeholder="Headline"  class="form-control" required>
+            </div> -->
+
+            <input name="type" value="2" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(content:  models.Content <- contentsToHeadlines.get(headline.getcHeadLineID)) {
+                        <option value="@content.getSequence">
+                            @if(content.getType==0){
+                                @if(content.getContent.length() > 20 && (content.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @content.getContent.substring(3,content.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @content.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(content.getType==1){
+                                Image
+                            }
+                            @if(content.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contentsToHeadlines.get(headline.getcHeadLineID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="mode_Headline@(headline.getcHeadLineID)">Select Language</label>
+                <select id="mode_Headline@(headline.getcHeadLineID)" class="form-control" onchange="updateLanguageOfCodeEditor('Headline@headline.getcHeadLineID');">
+                    <option value="java">Java</option>
+                    <option value="javascript" selected>Javascript</option>
+                    <option value="haskell">Haskell</option>
+                </select>
+
+                <textarea name="content" id="inputCode_Headline@(headline.getcHeadLineID)" hidden></textarea>
+
+                <div id="editor_Headline@(headline.getcHeadLineID)" class="editor"></div>
+
+            </div>
+
+            <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode_Headline@(headline.getcHeadLineID)()">
+
+        </form>
+
+
+        <script>
+        var editor = ace.edit("editor_Headline@(headline.getcHeadLineID)");
+        editor.setTheme("ace/theme/chrome");
+        editor.getSession().setMode("ace/mode/java");
+    </script>
+
+
+        <script>
+                function setCode_Headline@(headline.getcHeadLineID)(){
+                    var editor = ace.edit("editor_Headline@(headline.getcHeadLineID)")
+                    editor.session.setNewLineMode("windows");
+
+                    var content = editor.getSession().getValue();
+                    var random = Math.random().toString(36).substring(7);
+
+                    var e = document.getElementById("mode_Headline@(headline.getcHeadLineID)");
+                    var language = e.options[e.selectedIndex].value;
+
+                    var mainDiv = document.createElement('div');
+                    mainDiv.setAttribute("id", "editor"+random);
+                    mainDiv.setAttribute("class", "editor");
+                    mainDiv.setAttribute("style", 'height: '+ (editor.session.getLength()*14+2) + 'px' );
+                    mainDiv.innerHTML = content+"";
+
+                    var s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    var code = 'var editor = ace.edit("editor' + random + '"); ' +
+                                'editor.setTheme("ace/theme/chrome"); ' +
+                                'editor.getSession().setMode("ace/mode/'+language+'"); ' +
+                                'editor.resize(); ' +
+                                'editor.setReadOnly(true); ' +
+                                'editor.session.setNewLineMode("windows");';
+                    try {
+                        s.appendChild(document.createTextNode(code));
+                        document.body.appendChild(s);
+                    } catch (e) {
+                        s.text = code;
+                        document.body.appendChild(s);
+                    }
+
+                    var outherDiv = document.createElement('div');
+                    outherDiv.appendChild(mainDiv);
+                    outherDiv.appendChild(s);
+
+                    document.getElementById('inputCode_Headline@(headline.getcHeadLineID)').value = outherDiv.innerHTML;
+                };
+            </script>
+    </div>
+
+    <div id="contentNewSubHeadline_forHeadline@headline.getcHeadLineID" hidden="hidden">
+        <form method="post" action="@routes.FlashCardControllerSensei.addNewSubHeadline(flashcard.getFlashCardID, headline.getcHeadLineID)">
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control" name="sequence" id="insertBefore">
+                    @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID)) {
+                        <option value="@subHeadline.getSequence"> @subHeadline.getTitle </option>
+                    }
+                <option value="@(1+subHeadlines.get(headline.getcHeadLineID).size)" selected> at the end </option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="newSubHeadline">New SubHeadline Name</label>
+                <input name="title" id="newSubHeadline" placeholder="SubHeadline"  class="form-control" required>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+
+
+        </form>
+    </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+

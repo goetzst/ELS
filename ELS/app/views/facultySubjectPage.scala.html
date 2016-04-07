@@ -1,0 +1,205 @@
+@(faculties: List[Faculty])(subjects: List[Subject])(email: String)(role: Integer)
+
+@mainFrame("Edit Faculties and Subjects")(email)(role){
+
+    @mainPageNavigation("facSub")
+
+    <h2>List of Faculties</h2>
+
+
+    @for(fac: Faculty <- faculties) {
+
+        <div class="list-group">
+
+            <div class="list-group-item active">
+                <a data-toggle="collapse" data-target="#fac@fac.getFacultyName.replace(' ','_')" aria-expanded="false" aria-controls="collapseExample" >
+                    <span style="color: #ffffff">@fac.getFacultyName</span>
+                </a>
+
+                <a data-toggle="modal" data-target="#editFac@fac.getFacultyName.replace(' ', '_')"><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="color: #ffffff"></span>  </a>
+                <a data-toggle="modal" data-target="#delFac@fac.getFacultyName.replace(' ', '_')"><span class="glyphicon glyphicon-trash" aria-hidden="true" style="color: #ffffff"></span>    </a>
+            </div>
+
+            <!-- Delete Faculty -->
+            <div class="modal fade" id="delFac@fac.getFacultyName.replace(' ', '_')" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Delete Faculty</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure that you want to delete the faculty including all documents. This can't be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-primary" href="@routes.FacultySubjectController.removeFaculty(fac.getFacultyName)">Ok</a>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit  Faculty -->
+            <div class="modal fade" id="editFac@fac.getFacultyName.replace(' ', '_')" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Edit Faculty</h4>
+                        </div>
+                        <form method="GET" action="@routes.FacultySubjectController.changeFaculty(fac.getFacultyName)">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="editFac">Please enter new name for @fac.getFacultyName</label>
+                                <input name="oldName" value="@fac.getFacultyName" type="text" hidden> <!-- needed for correct form bining -->
+                                <input name="newFacName@fac.getFacultyName.replace(' ', '_')" id="editFac" class="form-control" type="text" placeholder="New Name" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input class="btn btn-primary" type="submit" value="Ok">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapse" id="fac@fac.getFacultyName.replace(' ','_')">
+
+                @for(sub: Subject <- subjects) {
+                    @if(sub.getFacultyName==fac.getFacultyName) {
+                        <div class="list-group-item" id="subjectForFac@fac.getFacultyName">
+                            @sub.getSubjectName
+                            <a data-toggle="modal" data-target="#editSub@sub.getSubjectID"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>      </a>
+                            <a data-toggle="modal" data-target="#delSub@sub.getSubjectID"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>    </a>
+                        </div>
+
+                        <!-- Delete Subject -->
+                        <div class="modal fade" id="delSub@sub.getSubjectID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="myModalLabel">Delete Subject</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure that you want to delete the subject including all documents. This can't be undone.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-primary" href="@routes.FacultySubjectController.removeSubject(sub.getSubjectID)">Ok</a>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Subject -->
+                        <div class="modal fade" id="editSub@sub.getSubjectID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="myModalLabel">Edit Subject</h4>
+                                    </div>
+                                    <form method="GET" action="@routes.FacultySubjectController.changeSubject(sub.getSubjectID)">
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label for="editSub">Please enter new name for @sub.getSubjectName</label>
+                                                <input name="subjectID" value="@sub.getSubjectID" type="text" hidden> <!-- needed for correct form binding -->
+                                                <input name="newName" id="editSub" class="form-control" type="text" placeholder="New Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input class="btn btn-primary" type="submit" value="Ok">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+
+                }
+
+                <script>
+                    if(document.getElementById("subjectForFac@(fac.getFacultyName)")){
+
+                    }else{
+                        var divNoSubject = document.createElement("div");
+                        divNoSubject.className = "list-group-item";
+                        var text = document.createElement("i");
+                        text.appendChild(document.createTextNode("no Subject yet"));
+
+                        divNoSubject.appendChild(text);
+                        document.getElementById("fac@fac.getFacultyName.replace(' ','_')").appendChild(divNoSubject);
+                    }
+                </script>
+            </div>
+        </div>
+
+    }
+
+
+
+    <!-- Create new Faculty --->
+    <a class="btn btn-default" data-toggle="modal" data-target="#newFac"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>  New faculty</a>
+
+    <div class="modal fade" id="newFac" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">New Faculty</h4>
+                </div>
+                <form method="GET" action="@routes.FacultySubjectController.addFaculty()">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="newFac">Please enter new name for the new Faculty</label>
+                            <input name="name" class="form-control" id="newFac" type="text" placeholder="New Faculty Name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="btn btn-primary" type="submit" value="Ok">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Create new Subject -->
+    <a class="btn btn-default" data-toggle="modal" data-target="#newSub"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New subject</a>
+
+    <div class="modal fade" id="newSub" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">New Subject</h4>
+                </div>
+                <form method="GET" action="@routes.FacultySubjectController.addSubject()">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="selFac">Select the faculty</label>
+                            <select class="form-control" id="selFac" name="facName">
+                            @for(fac: Faculty <- faculties) {
+                                <option>@fac.getFacultyName</option>
+                            }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newSub">Enter a name for the new Subject</label>
+                            <input name="subName" type="text" id="newSub" class="form-control" placeholder="New Subject Name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="btn btn-primary" type="submit" value="Ok">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

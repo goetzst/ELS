@@ -1,0 +1,25 @@
+@(documentID: Integer)(chapterID: Integer)
+
+ <!-- <a data-toggle="modal" data-target="#confirmDelete@chapterID" class="btn-distance cursorPointer">
+    <span data-toggle="tooltip" title="Delete this chapter" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+ </a> -->
+
+
+<!-- Modal - Confirm Delete of Chapter-->
+<div class="modal fade" id="confirmDeleteChapter@chapterID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete Chapter</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure that you want to delete the chapter?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="@routes.ContentController.deleteChapter(chapterID, documentID)" class="btn btn-primary">Ok</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

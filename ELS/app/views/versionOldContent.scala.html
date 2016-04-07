@@ -1,0 +1,32 @@
+@(content: models.Content)(document: Document)(email: String)(role: Integer)
+
+
+@mainFrame("Version")(email)(role) {
+
+
+    @mainPageNavigation("main")
+
+   <header>
+       <h1>@document.getDocumentName</h1>
+   </header>
+
+    @editDocumentPage("version")(document.getDocumentID)
+
+    <h3>Old Content</h3>
+
+    <p>The old content is display below. Please make sure that the parent element (e.g. Chaper, Headline or SubHeadline) of this content still exists. </p>
+
+    <div class="content" style="margin: 15px 0px;">
+        @Html(content.getContent)
+    </div>
+
+    <div class="form-group">
+        <a class="btn btn-primary" href="#confirmRollbackContent@content.getId" data-toggle="modal"> Rollback </a>
+        <a class="btn btn-default" href="@routes.VersionController.versionPage(document.getDocumentID)"> Back </a>
+    </div>
+
+
+    <!-- typeOfRollback 0:= chapter, 1:= headline, 2:= subHeadline 3:= content-->
+    @versionConfirmRollback(content.getId)(3)(document)
+
+}

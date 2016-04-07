@@ -1,0 +1,45 @@
+@(tags: java.util.List[Tag])(ID: Integer)(kind: Integer)(docID: Integer)(usedTagList: java.util.List[Tag])
+
+@main("Tag") {
+    <table>
+        <tr>
+            <td>You can either choose from already existing tags:</td>
+            <td>Or create a new one: </td>
+            <td>Already Existing Tags:</td>
+        </tr>
+        <tr>
+            <td>
+                <div class="dropdown">
+                        <!-- Link or button to toggle dropdown -->
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">tags<b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        @for(tag <- tags) {
+                            <li>
+                                <form class="form-horizontal" method="post" action="@routes.TagController.addTag(kind, ID, tag.getTagID, docID)">
+                                    <button id="bt1" type="submit" class="btn btn-link">@tag.getTagName</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </td>
+            <td>
+                <form class="form-horizontal" method="post" action="@routes.TagController.createAndAddTag(kind, ID, docID)">
+
+                    <div class="form-group">
+                        <label for="tagName" class="sr-only">repeat Password</label>
+                        <input type="tagName" name="tagName" id="tagName" class="form-control" placeholder="new Tag" required>
+                    </div>
+
+                    <button id="bt1" type="submit" class="btn btn-primary">Submit</button>
+                    <a class="btn btn-default"  href="@routes.DocumentControllerSama.documentPage(docID, false)">Cancel</a>
+                </form>
+            </td>
+            <td>
+                @for(tag <- usedTagList) {
+                    @tag.getTagName
+                }
+            </td>
+        </tr>
+    </table>
+}

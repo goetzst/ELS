@@ -1,0 +1,990 @@
+@(document: Document)(chapters: java.util.List[ChapterChan])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(contentToChapters: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToSubHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(references: java.util.HashMap[Integer, java.util.List[models.Reference]])(comments: java.util.HashMap[Integer, java.util.List[Comment]])(subComments: java.util.HashMap[Integer, java.util.List[SubComment]])(moderators: java.util.List[User])(tags: java.util.List[Tag])(chapterTags: java.util.HashMap[Integer, java.util.List[Tag]])(headlineTags: java.util.HashMap[Integer, java.util.List[Tag]])(subHeadlineTags: java.util.HashMap[Integer, java.util.List[Tag]])(commentTags: java.util.HashMap[Integer, java.util.List[Tag]])(subCommentTags: java.util.HashMap[Integer, java.util.List[Tag]])(email: String)(role: Integer)(toEdit: Boolean)
+
+
+
+    @mainFrame(document.getDocumentName)(email)(role){
+
+
+
+    <!-- Update language of code editor -->
+    <script>
+        function updateLanguageOfCodeEditor(id){
+            var languageSelection = document.getElementById('mode_'+id);
+            var language = languageSelection.options[languageSelection.selectedIndex].value;
+
+            var editor = ace.edit('editor_'+id);
+            editor.getSession().setMode("ace/mode/"+language);
+        };
+    </script>
+
+    <!-- Ask and delete Token for Edit Comments -->
+    <script>
+        function checkTokenForComment(commentID, link){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/check/2/'+commentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+
+            //Token already used
+            if(request.status == 400) {
+                 console.log('Comment gesperrt: ' + request.status);
+
+                //remove old warning
+                if(document.getElementById('alertComment'+commentID)){
+                    document.getElementById('alertComment'+commentID).outerHTML="";
+                }
+
+                //create warning
+                var warningComment = document.createElement('div');
+                warningComment.setAttribute('id', 'alertComment'+commentID);
+                warningComment.setAttribute('class', 'alert alert-danger' );
+                warningComment.setAttribute('style', 'margin-bottom: 0px;' );
+                warningComment.innerHTML = 'Comment is blocked. Someone else is editing the comment. Please try again later.';
+
+                //remove modal for editing the content
+                if(document.getElementById('editComment'+commentID)){
+                    document.getElementById('editComment'+commentID).outerHTML="";
+                }
+
+                //append warnging
+                if(link){
+                    if(link.parentNode){
+                        if(link.parentNode.parentNode){
+                            var position = link.parentNode.parentNode.parentNode;
+                            position.appendChild(warningComment);
+                        }
+                    }
+                }
+
+                //style link as disabled
+                link.setAttribute('style', 'opacity: 0.7; cursor: not-allowed; ');
+                link.setAttribute('onclick', '');
+            }
+
+            //Token free
+            if(request.status == 200){
+                console.log('Comment frei. Token bekommen ' + request.status + ' CommentID: '+commentID);
+            }
+        }
+
+        function deleteTokenForComment(commentID){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/delete/2/'+commentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+            if(request.status == 200) {
+                console.log("Token for Comment deleted");
+            }
+        }
+    </script>
+
+
+    <!-- Ask and delete Token for Edit SubComments -->
+    <script>
+        function checkTokenForSubComment(subCommentID, link){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/check/3/'+subCommentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+
+            //Token already used
+            if(request.status == 400) {
+                 console.log('SubComment gesperrt: ' + request.status);
+
+                //remove old warning
+                if(document.getElementById('alertSubComment'+subCommentID)){
+                    document.getElementById('alertSubComment'+subCommentID).outerHTML="";
+                }
+
+                //create warning
+                var warningSubComment = document.createElement('div');
+                warningSubComment.setAttribute('id', 'alertSubComment'+subCommentID);
+                warningSubComment.setAttribute('class', 'alert alert-danger' );
+                warningSubComment.setAttribute('style', 'margin-bottom: 0px;' );
+                warningSubComment.innerHTML = 'SubComment is blocked. Someone else is editing the SubComment. Please try again later.';
+
+                //remove modal for editing the content
+                if(document.getElementById('editSubComment'+subCommentID)){
+                    document.getElementById('editSubComment'+subCommentID).outerHTML="";
+                }
+
+                //append warnging
+                if(link){
+                    if(link.parentNode){
+                        if(link.parentNode.parentNode){
+                            var position = link.parentNode.parentNode.parentNode;
+                            position.appendChild(warningSubComment);
+                        }
+                    }
+                }
+
+                //style link as disabled
+                link.setAttribute('style', 'opacity: 0.7; cursor: not-allowed; ');
+                link.setAttribute('onclick', '');
+            }
+
+            //Token free
+            if(request.status == 200){
+                console.log('SubComment frei. Token bekommen ' + request.status + ' SubCommentID: '+subCommentID);
+            }
+        }
+
+        function deleteTokenForSubComment(subCommentID){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/delete/3/'+subCommentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+            if(request.status == 200) {
+                console.log("Token for SubComment deleted");
+            }
+        }
+    </script>
+
+    <!-- Ask and delete Token for Delete Content -->
+    <script>
+        function checkTokenForContentDelete(contentID, link){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/check/4/'+contentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+
+            //Token already used
+            if(request.status == 400) {
+                console.log('Content gesperrt: ' + request.status);
+
+                var button = document.getElementById('confirmDeleteContentButton'+contentID);
+                button.setAttribute('disabled', 'disabled');
+
+                var warningContent = document.createElement('div');
+                warningContent.setAttribute('id', 'confirmDeleteContentWarning'+contentID);
+                warningContent.setAttribute('class', 'label label-danger');
+                warningContent.setAttribute('style', 'margin-top: 8px;');
+                warningContent.innerHTML = 'Content is blocked. Someone else is editing the Content. Please try again later.';
+
+                button.parentNode.appendChild(warningContent);
+
+
+            }
+
+            //Token free
+            if(request.status == 200){
+                console.log('Content frei. Token bekommen ' + request.status + ' ContentID: '+contentID);
+            }
+        }
+
+        function deleteTokenForContentDelete(contentID){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/delete/4/'+contentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+            if(request.status == 200) {
+                console.log("Token for Content deleted");
+                if(document.getElementById('confirmDeleteContentWarning'+contentID)){
+                    var parent = document.getElementById('confirmDeleteContentWarning'+contentID).parentNode;
+                    parent.removeChild(document.getElementById('confirmDeleteContentWarning'+contentID));
+                    document.getElementById('confirmDeleteContentButton'+contentID).removeAttribute('disabled');
+                }
+            }
+        }
+    </script>
+
+
+    <!-- Ask and delete Token for Delete Comment -->
+    <script>
+        function checkTokenForCommentDelete(commentID, link){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/check/2/'+commentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+
+            //Token already used
+            if(request.status == 400) {
+                console.log('Comment gesperrt: ' + request.status);
+
+                var button = document.getElementById('confirmDeleteCommentButton'+commentID);
+                button.setAttribute('disabled', 'disabled');
+
+                var warningContent = document.createElement('div');
+                warningContent.setAttribute('id', 'confirmDeleteCommentWarning'+commentID);
+                warningContent.setAttribute('class', 'label label-danger');
+                warningContent.setAttribute('style', 'margin-top: 8px;');
+                warningContent.innerHTML = 'Comment is blocked. Someone else is editing the Content. Please try again later.';
+
+                button.parentNode.appendChild(warningContent);
+            }
+
+            //Token free
+            if(request.status == 200){
+                console.log('Comment frei. Token bekommen ' + request.status + ' CommentID: '+commentID);
+            }
+        }
+
+        function deleteTokenForCommentDelete(commentID){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/delete/2/'+commentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+            if(request.status == 200) {
+                console.log("Token for Comment deleted");
+                if(document.getElementById('confirmDeleteCommentWarning'+commentID)){
+                    var parent = document.getElementById('confirmDeleteCommentWarning'+commentID).parentNode;
+                    parent.removeChild(document.getElementById('confirmDeleteCommentWarning'+commentID));
+                    document.getElementById('confirmDeleteCommentButton'+commentID).removeAttribute('disabled');
+                }
+            }
+        }
+    </script>
+
+
+    <!-- Ask and delete Token for Delete SubComment -->
+    <script>
+        function checkTokenForSubCommentDelete(subCommentID, link){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/check/3/'+subCommentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+
+            //Token already used
+            if(request.status == 400) {
+                console.log('SubComment gesperrt: ' + request.status);
+
+                var button = document.getElementById('confirmDeleteSubCommentButton'+subCommentID);
+                button.setAttribute('disabled', 'disabled');
+
+                var warningContent = document.createElement('div');
+                warningContent.setAttribute('id', 'confirmDeleteSubCommentWarning'+subCommentID);
+                warningContent.setAttribute('class', 'label label-danger');
+                warningContent.setAttribute('style', 'margin-top: 8px;');
+                warningContent.innerHTML = 'SubComment is blocked. Someone else is editing the Content. Please try again later.';
+
+                button.parentNode.appendChild(warningContent);
+            }
+
+            //Token free
+            if(request.status == 200){
+                console.log('SubComment frei. Token bekommen ' + request.status + ' SubCommentID: '+subCommentID);
+            }
+        }
+
+        function deleteTokenForSubCommentDelete(subCommentID){
+            //Send http request and get the response
+            var request = new XMLHttpRequest();
+            request.open('GET', '/token/delete/3/'+subCommentID+'/' + encodeURIComponent('@email'), false);
+            request.send();
+            if(request.status == 200) {
+                console.log("Token for SubComment deleted");
+                if(document.getElementById('confirmDeleteSubCommentWarning'+subCommentID)){
+                    var parent = document.getElementById('confirmDeleteSubCommentWarning'+subCommentID).parentNode;
+                    parent.removeChild(document.getElementById('confirmDeleteSubCommentWarning'+subCommentID));
+                    document.getElementById('confirmDeleteSubCommentButton'+subCommentID).removeAttribute('disabled');
+                }
+            }
+        }
+    </script>
+
+
+    <div>
+
+        @mainPageNavigation("main")
+
+
+        <div class="row">
+
+            <!-- Navbar -->
+            <div class="col-md-3 hidden-print" id="leftColumn">
+                <div id="mynav" data-mcs-theme="dark" data-spy="affix" data-offset-top="243">
+                <div class="list-group" >
+                    <ul class="nav" >
+                    @for(chapter: ChapterChan <- chapters){
+                        <li class="nav-link"><a href="#chapter@chapter.getChapterID"><b>@chapter.getTitle</b> <span class="sr-only">(current)</span></a></li>
+
+                        @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)){
+                            <li class="nav-link"><a href="#headline@headline.getcHeadLineID">@headline.getTitle</a></li>
+
+                            @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID)){
+                                <li class="nav-link" style="padding-left: 5px"><a href="#subHeadline@subHeadline.getcSubHeadLineID" > @subHeadline.getTitle</a></li>
+                            }
+                        }
+                    }
+                    </ul>
+                </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="col-md-7">
+
+
+                <header>
+                    <h1>@document.getDocumentName
+
+                    @if(!toEdit) {
+                        @if(role == 0 || email.equals(document.getDozentEmail)) {
+                            <small class="hidden-print" data-toggle="tooltip" data-placement="top" title="Edit Document">
+                                <a class="hidden-print" href="@routes.DocumentControllerSama.documentPage(document.getDocumentID, true)">
+                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                </a>
+                            </small>
+                        } else {
+                            @if((moderators.map((u: User) => u.getEmail)).contains(email)){
+                                <small class="hidden-print" data-toggle="tooltip" data-placement="top" title="Edit Document">
+                                    <a class="hidden-print" href="@routes.DocumentControllerSama.documentPage(document.getDocumentID, true)">
+                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                    </a>
+                                </small>
+                            }
+                        }
+                    }else{
+                        <small class="hidden-print" data-toggle="tooltip" data-placement="top" title="Back to Document Page">
+                            <a class="hidden-print" href="@routes.DocumentControllerSama.documentPage(document.getDocumentID, false)">
+                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span>
+                            </a>
+                        </small>
+                    }
+
+                    </h1>
+
+
+                </header>
+
+                @if(toEdit) {
+                    <!-- Navigation bar -->
+                    @editDocumentPage("home")(document.getDocumentID)
+                }
+
+                @if(toEdit){
+                    <div class="form-group">
+
+                        @if(toEdit && (role == 0 || document.getDozentEmail.equals(email))) {
+                            <!-- Delete Document -->
+                            @documentHelper.deleteDocument(document.getDocumentID)
+
+                            <!-- Edit Document Name -->
+                            @documentHelper.editDocumentName(document.getDocumentID)(document.getDocumentName)
+
+                                <!-- Toggle Document visibility-->
+                                @documentHelper.toggleVisibility(document.getDocumentID)(document.isVisible)
+                        }
+
+                        <!-- Add new Chapter -->
+                        @documentHelper.addChapter(document.getDocumentID)(chapters)
+
+                    </div>
+                }
+
+                @for(chapter: ChapterChan <- chapters) {
+                <div class="chapter" >
+
+                    <!--- Chapter Title with the TAG-Button and Tags--->
+                    <div class="chapterTitle row ">
+
+                            @if(!toEdit){
+                                <div class="col-md-10">
+                                <h2 id="chapter@chapter.getChapterID">@chapter.getTitle</h2>
+                                @for(tag: Tag <- chapterTags.get(chapter.getChapterID)){
+                                    @if(tag.isGlobal){
+                                        @if(role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)){
+                                            <small class="hidden-print">
+                                                <a href="@routes.TagController.deleteChapterChanTag(tag.getTagID, chapter.getChapterID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                            </small>
+                                        }
+                                        <small class="text-danger"><i>@tag.getTagName</i></small>
+                                    }else{
+                                        <small class="hidden-print">
+                                            <a href="@routes.TagController.deleteChapterChanTag(tag.getTagID, chapter.getChapterID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                        </small>
+                                        <small class="hidden-print"><i>@tag.getTagName</i></small>
+                                    }
+                                }
+                            }
+
+                            @if(toEdit){
+                                <div class="col-md-12">
+                                <h2 style="display: inline" id="chapter@chapter.getChapterID">@chapter.getTitle</h2>
+
+                                <!-- Delete Chapter -->
+                                <a  class="hidden-print" data-toggle="modal" data-target="#confirmDeleteChapter@chapter.getChapterID" >
+                                    <span data-toggle="tooltip" title="Delete this chapter" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </a>
+
+                                <!-- Change Chapter -->
+                                <a class="hidden-print" data-toggle="modal" href="#editChapter@chapter.getChapterID" aria-expanded="false" aria-controls="modalExample">
+                                    <span data-toggle="tooltip" title="Edit this Chapter" class="glyphicon glyphicon-pencil"></span>
+                                </a>
+
+                                 <!-- Add new Content to Chapter -->
+                                <a class="hidden-print" data-toggle="collapse" data-target="#chapterCollapse@chapter.getChapterID" onclick="setRadioButtonDefault('chapterRadio@(chapter.getChapterID)_1')" aria-expanded="false">
+                                    <span data-toggle="tooltip" title="Add content to this chapter" class="glyphicon glyphicon-plus"></span>
+                                </a>
+
+                            }
+
+                        </div>
+
+
+                        <!-- Tag the Chapter --->
+                        @if(!toEdit) {
+                            <div class="col-md-2 text-right hidden-print">
+                                <h2>
+                                <div class="dropdown hidden-print">
+                                    <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown"> Tag with <b class="caret"></b></a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        @for(tag <- tags) {
+
+                                            @if(tag.isGlobal){
+                                                @if((role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)) && tag.getDocID == document.getDocumentID){
+                                                    <li>
+                                                        <form method="post" action="@routes.TagController.addTag(0, chapter.getChapterID, tag.getTagID, document.getDocumentID)">
+                                                            <button class="btn btn-link" type="submit">global: @tag.getTagName</button>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            }else{
+                                                <li>
+                                                    <form method="post" action="@routes.TagController.addTag(0, chapter.getChapterID, tag.getTagID, document.getDocumentID)">
+                                                        <button class="btn btn-link" type="submit">@tag.getTagName</button>
+                                                    </form>
+                                                </li>
+                                            }
+
+                                        }
+                                        <li><form><a class="btn btn-link" data-toggle="modal" data-target="#createNewTagKIND0AndID@chapter.getChapterID" aria-expanded="false" aria-controls="collapseExample"><i>create new Tag</i></a></form></li>
+                                    </ul>
+                                </div>
+                                </h2>
+
+                                <!-- kind of class on which tag will be added 0 := chapter, 1 := comment, 2 := subComment 3:= headline 4:= subHeadline -->
+                                @documentHelper.createTagAndAddToKind(document.getDocumentID)(chapter.getChapterID)(0)(moderators)(document.getDozentEmail)(email)(role)
+
+                            </div>
+                        }
+
+
+                    </div>
+
+                    <div class="chapterContent">
+
+                        <!-- Import functionality for Adding a new Content to Chapter and Edit chapter and Delete Chapter-->
+                        @if(toEdit) {
+                            @documentHelper.addContentToChapter(chapter)(contentToChapters)(headlines)
+                            @documentHelper.editChapter(chapter)(chapters)
+                            @documentHelper.deleteChapter(document.getDocumentID)(chapter.getChapterID)
+                        }
+
+                        <!-- Display the content for chapter -->
+                        @for(content: models.Content <- contentToChapters.get(chapter.getChapterID)) {
+
+                            @if(content.getType==0){
+                                <div class="content contentText" id="content@content.getContentID">
+                                    <div class="contentHead">
+                                    @if(toEdit) {
+                                        <a href="@routes.ContentController.changeContentPage(content.getContentID, chapter.getChapterID(), 0)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                        <!-- Delete Content -->
+                                        @documentHelper.deleteContent(content)(chapter.getChapterID)(0)
+                                    }
+                                    </div>
+                                    <div class="contentBody">
+                                        @Html(content.getContent)
+                                    </div>
+                                </div>
+                            }
+                            @if(content.getType==1){
+                                <div class="content contentImage" id="content@content.getContentID">
+                                    <div class="contentHead">
+                                    @if(toEdit) {
+                                        <a href="@routes.ContentController.changeContentPage(content.getContentID, chapter.getChapterID(), 0)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                        <!-- Delete Content -->
+                                        @documentHelper.deleteContent(content)(chapter.getChapterID)(0)
+                                    }
+                                    </div>
+                                    <div class="contentBody">
+                                        @Html(content.getContent)
+                                    </div>
+                                </div>
+                            }
+                            @if(content.getType==2){
+                                <div class="content contentCode" id="content@content.getContentID">
+                                    <div class="contentHead">
+                                    @if(toEdit) {
+                                        <a href="@routes.ContentController.changeContentPage(content.getContentID, chapter.getChapterID(), 0)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                        <!-- Delete Content -->
+                                        @documentHelper.deleteContent(content)(chapter.getChapterID)(0)
+                                    }
+                                    </div>
+                                    <div class="contentBody">
+                                        @Html(content.getContent)
+                                    </div>
+                                </div>
+                            }
+                            @documentHelper.referenceSection(references)(content)(document.getDocumentID)(chapters)(headlines)(subHeadlines)(contentToChapters)(contentToHeadlines)(contentToSubHeadlines)(toEdit)
+                            @documentHelper.commentSection(comments.get(content.getContentID))(subComments)(content)(document.getDocumentID)(tags)(commentTags)(subCommentTags)(email)(role)(toEdit)(moderators)(document.getDozentEmail)
+
+                        }
+
+
+
+                        @for(headline: ContentHeadline <- headlines.get(chapter.getChapterID)) {
+
+                            <div class="headline">
+                                <div class="headlineTitle row">
+                                    <div class="col-md-10">
+
+                                        @if(!toEdit){
+                                            <h3 id="headline@headline.getcHeadLineID">@headline.getTitle</h3>
+                                            <!-- Show tags of headline -->
+                                            @for(tag: Tag <- headlineTags.get(headline.getcHeadLineID())){
+                                                @if(tag.isGlobal){
+                                                    @if(role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)){
+                                                        <small class="hidden-print">
+                                                            <a href="@routes.TagController.deleteContentHeadlineTag(tag.getTagID, headline.getcHeadLineID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                                        </small>
+                                                    }
+                                                    <small class="text-danger"><i>@tag.getTagName</i></small>
+                                                }else{
+                                                    <small class="hidden-print">
+                                                        <a href="@routes.TagController.deleteContentHeadlineTag(tag.getTagID, headline.getcHeadLineID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                                    </small>
+                                                    <small class="hidden-print"><i>@tag.getTagName</i></small>
+                                                }
+                                            }
+                                        }
+
+                                        @if(toEdit){
+                                            <h3 style="display: inline;" id="headline@headline.getcHeadLineID">@headline.getTitle</h3>
+                                            <!-- Delete Headline -->
+                                            @documentHelper.deleteHeadline(headline)(chapter)
+
+                                            <!-- Edit Headline -->
+                                            @documentHelper.editHeadline(headline)(headlines)
+
+                                            <!-- Add a new content to the Headline -->
+                                            <a data-toggle="collapse" href="#headlineAddContent@headline.getcHeadLineID()" onclick="setRadioButtonDefault('headlineRadio@(headline.getcHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+                                                <span data-toggle="tooltip" title="Add new Content to this Headline" class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                    <!-- Tag the Headline --->
+                                    @if(!toEdit) {
+                                        <div class="col-md-2 text-right hidden-print">
+                                            <h3>
+                                            <div class="dropdown hidden-print">
+                                                <a href="#" class="dropdown-toggle btn btn-sm btn-default" data-toggle="dropdown"> Tag with <b class="caret"></b></a>
+                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                                    @for(tag <- tags) {
+                                                        @if(tag.isGlobal){
+                                                            @if((role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)) && tag.getDocID == document.getDocumentID){
+                                                                <li>
+                                                                    <form method="post" action="@routes.TagController.addTag(3, headline.getcHeadLineID, tag.getTagID, document.getDocumentID)">
+                                                                        <button class="btn btn-link" type="submit">global: @tag.getTagName</button>
+                                                                    </form>
+                                                                </li>
+                                                            }
+                                                        }else{
+                                                            <li>
+                                                                <form method="post" action="@routes.TagController.addTag(3, headline.getcHeadLineID, tag.getTagID, document.getDocumentID)">
+                                                                    <button class="btn btn-link" type="submit">@tag.getTagName</button>
+                                                                </form>
+                                                            </li>
+                                                        }
+                                                    }
+                                                    <li><form><a class="btn btn-link" data-toggle="modal" data-target="#createNewTagKIND3AndID@headline.getcHeadLineID()" aria-expanded="false" aria-controls="collapseExample"><i>create new Tag</i></a></form></li>
+                                                </ul>
+                                            </div>
+                                            </h3>
+                                        </div>
+
+
+                                        <!-- kind of class on which tag will be added 0 := chapter, 1 := comment, 2 := subComment 3:= headline 4:= subHeadline -->
+                                        @documentHelper.createTagAndAddToKind(document.getDocumentID)(headline.getcHeadLineID)(3)(moderators)(document.getDozentEmail)(email)(role)
+                                    }
+
+                                </div>
+
+
+
+                                <div class="headlineContent">
+
+                                    @if(toEdit) {
+                                        @documentHelper.addContentToHeadline(headline)(contentToHeadlines)(subHeadlines)
+                                    }
+
+
+                                    @for(headlineContent: models.Content <- contentToHeadlines.get(headline.getcHeadLineID)) {
+                                        <div class="content @if(headlineContent.getType==0){contentText}@if(headlineContent.getType==1){contentImage}@if(headlineContent.getType==2){contentCode}" id="content@headlineContent.getContentID">
+                                            <div class="contentHead">
+                                            @if(toEdit) {
+                                                <a href="@routes.ContentController.changeContentPage(headlineContent.getContentID, headline.getcHeadLineID(), 1)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                                    <!-- Delete Content -->
+                                                @documentHelper.deleteContent(headlineContent)(headline.getcHeadLineID)(1)
+                                            }
+                                            </div>
+                                            <div class="contentBody">
+                                                @Html(headlineContent.getContent)
+                                            </div>
+                                            @documentHelper.referenceSection(references)(headlineContent)(document.getDocumentID)(chapters)(headlines)(subHeadlines)(contentToChapters)(contentToHeadlines)(contentToSubHeadlines)(toEdit)
+                                        </div>
+                                        @documentHelper.commentSection(comments.get(headlineContent.getContentID))(subComments)(headlineContent)(document.getDocumentID)(tags)(commentTags)(subCommentTags)(email)(role)(toEdit)(moderators)(document.getDozentEmail)
+                                    }
+
+                                    <!-- Display the SubHeadline with its content -->
+                                    @for(subHeadline: ContentSubHeadline <- subHeadlines.get(headline.getcHeadLineID)) {
+                                        <div class="subHeadline">
+                                            <div class="subHeadlineTitle row">
+                                                <div class="col-md-10">
+
+                                                    @if(!toEdit){
+                                                        <h4 id="subHeadline@subHeadline.getcSubHeadLineID"> @subHeadline.getTitle </h4>
+                                                        <!-- Show tags of subHeadline -->
+                                                        @for(tag: Tag <- subHeadlineTags.get(subHeadline.getcSubHeadLineID())){
+                                                            @if(tag.isGlobal){
+                                                                @if(role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)){
+                                                                    <small class="hidden-print">
+                                                                        <a href="@routes.TagController.deleteContentSubHeadlineTag(tag.getTagID, subHeadline.getcSubHeadLineID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                                                    </small>
+                                                                }
+                                                                <small class="text-danger"><i>@tag.getTagName</i></small>
+                                                            }else{
+                                                                <small class="hidden-print">
+                                                                    <a href="@routes.TagController.deleteContentSubHeadlineTag(tag.getTagID, subHeadline.getcSubHeadLineID, 1)" data-toggle="tooltip" title="Delete Tag from Content"><span class="glyphicon glyphicon-trash"></span></a>
+                                                                </small>
+                                                                <small class="hidden-print"><i>@tag.getTagName</i></small>
+                                                            }
+                                                        }
+                                                    }
+
+                                                    @if(toEdit){
+                                                        <h4 style="display: inline;" id="subHeadline@subHeadline.getcSubHeadLineID"> @subHeadline.getTitle </h4>
+
+                                                        <!-- Delete SubHeadline -->
+                                                            @documentHelper.deleteSubHeadline(subHeadline)(headline)
+                                                        <!-- Edit SubHeadline -->
+                                                            @documentHelper.editSubHeadline(subHeadline)(subHeadlines)
+                                                        <!-- Add a new content to the SubHeadline -->
+                                                        <a data-toggle="collapse" href="#subHeadlineAddContent@subHeadline.getcSubHeadLineID()" onclick="setRadioButtonDefault('subHeadlineRadio@(subHeadline.getcSubHeadLineID())_1')" aria-expanded="false" aria-controls="collapseExample">
+                                                            <span data-toggle="tooltip" title="Add new Content to this SubHeadline" class="glyphicon glyphicon-plus"></span>
+                                                        </a>
+
+                                                    }
+
+                                                </div>
+
+                                                <!-- Tag the SubHeadline --->
+                                                @if(!toEdit) {
+                                                    <div class="col-md-2 text-right hidden-print">
+                                                        <h4>
+                                                            <div class="dropdown hidden-print">
+                                                                <a href="#" class="dropdown-toggle btn btn-xs btn-default" data-toggle="dropdown"> Tag with <b class="caret"></b></a>
+                                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                                                    @for(tag <- tags) {
+                                                                        @if(tag.isGlobal){
+                                                                            @if((role == 0 || email.equals(document.getDozentEmail)  || (moderators.map((u: User) => u.getEmail)).contains(email)) && tag.getDocID == document.getDocumentID){
+                                                                                <li>
+                                                                                    <form method="post" action="@routes.TagController.addTag(4, subHeadline.getcSubHeadLineID(), tag.getTagID, document.getDocumentID)">
+                                                                                        <button class="btn btn-link" type="submit">global: @tag.getTagName</button>
+                                                                                    </form>
+                                                                                </li>
+                                                                            }
+                                                                        }else{
+                                                                            <li>
+                                                                                <form method="post" action="@routes.TagController.addTag(4, subHeadline.getcSubHeadLineID(), tag.getTagID, document.getDocumentID)">
+                                                                                    <button class="btn btn-link" type="submit"> @tag.getTagName</button>
+                                                                                </form>
+                                                                            </li>
+                                                                        }
+                                                                    }
+                                                                    <li><form><a class="btn btn-link" data-toggle="modal" data-target="#createNewTagKIND4AndID@subHeadline.getcSubHeadLineID()" aria-expanded="false" aria-controls="collapseExample"><i>create new Tag</i></a></form></li>
+                                                                </ul>
+                                                            </div>
+                                                        </h4>
+                                                    </div>
+
+                                                        <!-- kind of class on which tag will be added 0 := chapter, 1 := comment, 2 := subComment 3:= headline 4:= subHeadline -->
+                                                    @documentHelper.createTagAndAddToKind(document.getDocumentID)(subHeadline.getcSubHeadLineID)(4)(moderators)(document.getDozentEmail)(email)(role)
+                                                }
+
+
+                                            </div>
+
+                                            <div class="subHeadlineContent">
+
+                                                @if(toEdit) {
+                                                    @documentHelper.addContentToSubHeadline(subHeadline)(contentToSubHeadlines)
+                                                }
+
+                                                @for(subHeadlineContent: models.Content <- contentToSubHeadlines.get(subHeadline.getcSubHeadLineID)) {
+                                                    <div class="content @if(subHeadlineContent.getType==0){contentText}@if(subHeadlineContent.getType==1){contentImage}@if(subHeadlineContent.getType==2){contentCode}" id="content@subHeadlineContent.getContentID">
+                                                        <div class="contentHead">
+                                                            @if(toEdit) {
+                                                                <a href="@routes.ContentController.changeContentPage(subHeadlineContent.getContentID, subHeadline.getcSubHeadLineID(), 2)"> <span class="glyphicon glyphicon-pencil"></span> Edit </a>
+
+                                                                <!-- Delete Content -->
+                                                                @documentHelper.deleteContent(subHeadlineContent)(subHeadline.getcSubHeadLineID)(2)
+                                                            }
+                                                        </div>
+                                                        <div class="contentBody">
+                                                            @Html(subHeadlineContent.getContent)
+                                                        </div>
+                                                        @documentHelper.referenceSection(references)(subHeadlineContent)(document.getDocumentID)(chapters)(headlines)(subHeadlines)(contentToChapters)(contentToHeadlines)(contentToSubHeadlines)(toEdit)
+                                                    </div>
+                                                    @documentHelper.commentSection(comments.get(subHeadlineContent.getContentID))(subComments)(subHeadlineContent)(document.getDocumentID)(tags)(commentTags)(subCommentTags)(email)(role)(toEdit)(moderators)(document.getDozentEmail)
+                                                }
+
+                                            </div> <!-- End subHeadlineContent -->
+
+                                        </div> <!-- End subHeadline -->
+                                    }
+                                </div> <!-- End headlineContent -->
+                            </div> <!-- End Headline -->
+                        }
+                    </div> <!-- End chapterContent -->
+
+
+                </div> <!-- End chapter -->
+                }
+
+
+            </div>
+
+
+            <div class="col-md-2 col-sm-2 hidden-print">
+
+                <div id="filter" data-spy="affix" data-offset-top="243">
+
+                    <!-- Filter-function  -->
+                    <div class="checkbox newContent" >
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="contentText" /> Hide all Text
+                        </label>
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="contentImage" /> Hide all Image
+                        </label>
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="contentCode" /> Hide all Code
+                        </label>
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="headline" /> Hide all Headlines with its content
+                        </label>
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="subHeadline" /> Hide all SubHeadlines with its content
+                        </label>
+                        <label>
+                            <input type="checkbox" onchange="filter(this)" value="commentButton" /> Hide all comment buttons
+                        </label>
+                    </div>
+
+
+                    <div>
+                        @if(!toEdit) {
+                            <button class="btn btn-default btn-lg" onclick="javascript:window.print()">
+                                <span class="glyphicon glyphicon-print"></span>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!-- Filter elements by class name -->
+    <script>
+        function filter(rb){
+            var type = rb.value;
+            var elementsToHide = document.getElementsByClassName(type);
+
+            for(var i = 0; i < elementsToHide.length; i++){
+                if(elementsToHide[i].hasAttribute('hidden')){
+                    elementsToHide[i].removeAttribute('hidden');
+                }else{
+                    elementsToHide[i].setAttribute('hidden', 'hidden');
+                }
+            }
+        }
+    </script>
+
+    <!-- Controlls the file types for uploaded files -->
+    <script>
+        var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+        function Validate(oForm, idOfWarningElement) {
+        var arrInputs = oForm.getElementsByTagName("input");
+        for (var i = 0; i < arrInputs.length; i++) {
+            var oInput = arrInputs[i];
+            if (oInput.type == "file") {
+                var sFileName = oInput.value;
+                if (sFileName.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            break;
+                        }
+                    }
+
+                    if (!blnValid) {
+                        var warn = document.getElementById(idOfWarningElement);
+                        warn.className = 'label label-danger';
+                        warn.innerHTML = 'Sorry, not allowed. Allowed extensions are: ' + _validFileExtensions.join(", ");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    </script>
+
+    <!-- Hide newComment Button by id -->
+    <script>
+        function hideNewCommentButton(id){
+            document.getElementById(id).setAttribute("hidden", "true");
+        }
+    </script>
+
+    <!-- Set Radio Button (referenced by id) checked. Used when you add a new content. -->
+    <script>
+        function setRadioButtonDefault(id) {
+            document.getElementById(id).setAttribute("checked", "checked");
+        }
+    </script>
+
+
+    <!-- When you add a content you can choose (by selecting the different radio buttons) which content it should be.
+     Depending on which content it should there are different input fields to display.
+     This function manage the showing/hiding of this input fields. -->
+    <script>
+        function setTypeOfContentToAddVisible(rb, idOfElement) {
+        var clicked = rb.value;
+        if(clicked == 'text'){
+            document.getElementById('contentText_for'+idOfElement).removeAttribute("hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'image'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).removeAttribute("hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'code'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).removeAttribute("hidden");
+            if(document.getElementById('contentNewHeadline_for'+idOfElement)){
+                document.getElementById('contentNewHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+            if(document.getElementById('contentNewSubHeadline_for'+idOfElement)){
+                document.getElementById('contentNewSubHeadline_for'+idOfElement).setAttribute("hidden", "hidden");
+            }
+        }
+        if(clicked == 'newHeadline'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentNewHeadline_for'+idOfElement).removeAttribute("hidden");
+        }
+        if(clicked == 'newSubHeadline'){
+            document.getElementById('contentText_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentImage_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentCode_for'+idOfElement).setAttribute("hidden", "hidden");
+            document.getElementById('contentNewSubHeadline_for'+idOfElement).removeAttribute("hidden");
+        }
+    }
+    </script>
+
+
+
+
+    <!-- Set the cotent for code-content for database -->
+    <script>
+        function setCode(id){
+            var editor = ace.edit('editor_'+id);
+            editor.session.setNewLineMode("windows");
+
+            var content = editor.getSession().getValue();
+            var random = Math.random().toString(36).substring(7);
+
+            var e = document.getElementById('mode_'+id);
+            var language = e.options[e.selectedIndex].value;
+
+            var mainDiv = document.createElement('div');
+            mainDiv.setAttribute("id", "editor"+random);
+            mainDiv.setAttribute("class", "editor");
+            mainDiv.setAttribute("style", 'height: '+ (editor.session.getLength()*14+2) + 'px' );
+            mainDiv.innerHTML = content+"";
+
+            var s = document.createElement('script');
+            s.type = 'text/javascript';
+            var code = 'var editor = ace.edit("editor' + random + '"); ' +
+                    'editor.setTheme("ace/theme/chrome"); ' +
+                    'editor.getSession().setMode("ace/mode/'+language+'"); ' +
+                    'editor.resize(); ' +
+                    'editor.setReadOnly(true); ' +
+                    'editor.session.setNewLineMode("windows");';
+            try {
+                s.appendChild(document.createTextNode(code));
+                document.body.appendChild(s);
+            } catch (e) {
+                s.text = code;
+                document.body.appendChild(s);
+            }
+
+            var outherDiv = document.createElement('div');
+            outherDiv.appendChild(mainDiv);
+
+            outherDiv.appendChild(s);
+
+            document.getElementById('inputCode_'+id).value = outherDiv.innerHTML;
+        };
+    </script>
+
+    <!-- Corrects the height of CodeEditors -->
+    @if(!toEdit) {
+        <script>
+            var editors = document.getElementsByClassName('editor');
+
+            for(var i = 0; i < editors.length; i++){
+                var oldAttribut = editors[i].getAttribute("style")+';';
+                editors[i].setAttribute('style', oldAttribut+'margin-top: 10px !important;');
+            }
+
+        </script>
+    }
+
+    <script>
+        $(function(){
+            var sideBarNavWidth=$('#leftColumn').width() - parseInt($('#mynav').css('paddingLeft')) - parseInt($('#mynav').css('paddingRight'));
+        $('#mynav').css('width', sideBarNavWidth);
+        });
+
+        window.onresize = function(event) {
+            var sideBarNavWidth=$('#leftColumn').width() - parseInt($('#mynav').css('paddingLeft')) - parseInt($('#mynav').css('paddingRight'));
+        $('#mynav').css('width', sideBarNavWidth);
+
+        };
+    </script>
+
+
+}
+
+

@@ -1,0 +1,3 @@
+@(documentID: Integer)(visibility: Boolean)
+
+<a href="@routes.DocumentControllerSama.changeVisibility(documentID)" class="btn btn-primary">@if(visibility){hideDocument}else{showDocument}</a>

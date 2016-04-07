@@ -1,0 +1,59 @@
+@(bookmarked: java.util.List[Document])(myDocument: java.util.List[Document])(email: String)(role: Integer)
+
+@mainFrame("ELS")(email)(role){
+    @mainPageNavigation("main")
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Bookmarked Documents</h2>
+            <ul class="list-group" id="bookmarkedDocumentList">
+                @for(doc <- bookmarked) {
+                    <li class="list-group-item" id="bookmarkedDocExists">
+                        <a href="@routes.DocumentControllerSama.documentPage(doc.getDocumentID, false)">@doc.getDocumentName</a>
+                    </li>
+                }
+            </ul>
+
+            <script>
+                if(document.getElementById("bookmarkedDocExists")){
+                }else{
+                    var divNoBookDoc = document.createElement("li");
+                    divNoBookDoc.className = "list-group-item";
+                    var text = document.createElement("i");
+                    text.appendChild(document.createTextNode("No Bookmarked Document yet"));
+
+                    divNoBookDoc.appendChild(text);
+                    document.getElementById("bookmarkedDocumentList").appendChild(divNoBookDoc);
+                }
+            </script>
+        </div>
+
+
+        <div class="col-md-4 col-md-offset-3">
+            <h2>My Documents</h2>
+            <ul class="list-group" id="myDocumentList">
+                @for(doc <- myDocument) {
+                    <li class="list-group-item" id="myDocExists">
+                        <a href="@routes.DocumentControllerSama.documentPage(doc.getDocumentID, true)">@doc.getDocumentName</a>
+                    </li>
+            }
+            </ul>
+
+            <script>
+                if(document.getElementById("myDocExists")){
+                }else{
+                    var divNoMyBookDoc = document.createElement("li");
+                    divNoMyBookDoc.className = "list-group-item";
+                    var text = document.createElement("i");
+                    text.appendChild(document.createTextNode("No own Document yet"));
+
+                    divNoMyBookDoc.appendChild(text);
+                    document.getElementById("myDocumentList").appendChild(divNoMyBookDoc);
+                }
+            </script>
+
+            @if(role==1 || role==0) {
+                <a class="btn btn-primary" href="@routes.DocumentControllerSama.createDocument()">Create Document</a>
+            }
+        </div>
+    </div>
+}

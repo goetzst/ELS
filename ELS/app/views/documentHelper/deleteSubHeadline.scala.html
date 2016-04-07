@@ -1,0 +1,25 @@
+@(subHeadline: ContentSubHeadline)(headline: ContentHeadline)
+
+<a data-toggle="modal" href="#confirmDeleteSubHeadline@subHeadline.getcSubHeadLineID" aria-expanded="false" aria-controls="collapseExample">
+    <span data-toggle="tooltip" title="Delete this SubHeadline" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+</a>
+
+
+<!-- Modal - Confirm Delete of SubHeadline-->
+<div class="modal fade" id="confirmDeleteSubHeadline@subHeadline.getcSubHeadLineID" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete SubHeadline</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure that you want to delete the SubHeadline with all of its content?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="@routes.ContentController.deleteContentSubHeadline(subHeadline.getcSubHeadLineID, headline.getcHeadLineID)" class="btn btn-primary">Ok</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

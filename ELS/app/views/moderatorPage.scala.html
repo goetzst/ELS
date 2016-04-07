@@ -1,0 +1,45 @@
+@(moderators: java.util.List[User])(document: Document)(email: String)(role: Integer)
+
+@mainFrame("Moderators")(email)(role) {
+
+    @mainPageNavigation("main")
+
+    <!--<h1><strong>@document.getDocumentName</strong></h1>-->
+    <h1>@document.getDocumentName</h1>
+
+    @editDocumentPage("moderators")(document.getDocumentID)
+
+    <h2>Moderator</h2>
+
+
+    <div class="list-group">
+        <a href="#" class="list-group-item active">
+            Current Moderators
+        </a>
+
+        @for(moderator: User <- moderators) {
+            <div class="list-group-item" >
+                @moderator.getEmail
+                    <a href="@routes.ModeratorController.deleteModerator(document.getDocumentID, moderator.getEmail)"><span class="glyphicon glyphicon-trash"></span>   </a>
+
+            </div>
+        }
+
+
+    </div>
+
+
+    <h5>Add new Moderators:</h5>
+    <form method="GET" action="@routes.ModeratorController.addModerator(document.getDocumentID)">
+        <div class="form-group">
+            <label hidden>Add new Moderarator</label>
+            <input type="email" name="moderatorEmail" placeholder="Moderator email" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Add">
+        </div>
+    </form>
+
+}
+
+

@@ -1,0 +1,370 @@
+@(content: models.Content)(contents: java.util.List[models.Content])(typeID: Integer)(parentID: Integer)(flashcard: FlashCard)(email: String)(role: Integer)
+<!-- TypeID: type of parent 0:= chapter, 1:= contentHeadline 2:= contentSubHeadline -->
+
+@mainFrame("Edit Content")(email)(role) {
+
+    @mainPageNavigation("flashcard")
+
+    <h2>Edit Content</h2>
+
+
+    <div class="form-group">
+        <label >Choose your content type </label></br>
+
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="text" onChange="changed(this);"> Text
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="image" onChange="changed(this);"> Image
+        </label>
+        <label class="radio-inline">
+            <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="code" onChange="changed(this);"> Code
+        </label>
+    </div>
+
+
+    <div id="contentText">
+
+        <form method="POST" action="@routes.FlashCardControllerSensei.changeContent(flashcard.getFlashCardID, content.getContentID, parentID, typeID)">
+
+            <input name="type" value="0" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control"  name="sequence" id="insertBefore">
+                    @for(contentTemp: models.Content <- contents) {
+                        <option value="@contentTemp.getSequence" @if(contentTemp.getSequence==content.getSequence){selected}>
+                            @if(contentTemp.getType==0){
+                                @if(contentTemp.getContent.length() > 20 && (contentTemp.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @contentTemp.getContent.substring(3,contentTemp.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @contentTemp.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(contentTemp.getType==1){
+                                Image
+                            }
+                            @if(contentTemp.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contents.size)">at the end</option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="inputText"></label>
+                <textarea name="content" class="editTextArea" rows="6" cols="96" id="inputText">@content.getContent</textarea>
+            </div>
+
+            <input type="submit" class="btn btn-primary" value="Ok">
+            <a href="@routes.FlashCardControllerSensei.flashCardPage(flashcard.getFlashCardID, true)" class="btn btn-default">Cancel</a>
+        </form>
+    </div>
+
+
+    <div id="contentImage" hidden="hidden">
+
+        <form method="POST" action="@routes.FlashCardControllerSensei.changeContent(flashcard.getFlashCardID, content.getContentID, parentID, typeID)" enctype="multipart/form-data" onsubmit="return Validate(this);">
+
+            <input name="type" value="1" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control"  name="sequence" id="insertBefore">
+                    @for(contentTemp: models.Content <- contents) {
+                        <option value="@contentTemp.getSequence" @if(contentTemp.getSequence==content.getSequence){selected}>
+                            @if(contentTemp.getType==0){
+                                @if(contentTemp.getContent.length() > 20 && (contentTemp.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @contentTemp.getContent.substring(3,contentTemp.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @contentTemp.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(contentTemp.getType==1){
+                                Image
+                            }
+                            @if(contentTemp.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contents.size)">at the end</option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fileUpdload">Change your file</label>
+                <input id="fileUpdload" type="file" name="picture">
+                <div id="warning"></div>
+            </div>
+
+
+            <input type="submit" value="Ok" class="btn btn-primary">
+            <a href="@routes.FlashCardControllerSensei.flashCardPage(flashcard.getFlashCardID, true)" class="btn btn-default">Cancel</a>
+
+        </form>
+
+    </div>
+
+
+    <div id="contentCode" hidden="hidden">
+
+        <form method="POST" action="@routes.FlashCardControllerSensei.changeContent(flashcard.getFlashCardID, content.getContentID, parentID, typeID)">
+
+            <input name="type" value="2" hidden>
+
+            <div class="form-group">
+                <label for="insertBefore">Insert before</label>
+                <select class="form-control"  name="sequence" id="insertBefore">
+                    @for(contentTemp: models.Content <- contents) {
+                        <option value="@contentTemp.getSequence" @if(contentTemp.getSequence==content.getSequence){selected}>
+                            @if(contentTemp.getType==0){
+                                @if(contentTemp.getContent.length() > 20 && (contentTemp.getContent.indexOf(' ', 20)!=(-1)) ){
+                                    @contentTemp.getContent.substring(3,contentTemp.getContent.indexOf(' ', 20)).replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€") ...
+                                }else{
+                                    @contentTemp.getContent.replaceAll("\\<.*?\\>", "").replace("&Auml;","Ä").replace("&auml;","ä").replace("&ouml;","ö").replace("&Ouml;","Ö").replace("&uuml;","ü").replace("&Uuml;;","Ü").replace("&szlig;","ß").replace("&euro;;","€")
+                                }
+                            }
+                            @if(contentTemp.getType==1){
+                                Image
+                            }
+                            @if(contentTemp.getType==2){
+                                Code
+                            }
+                        </option>
+                    }
+                    <option value="@(1+contents.size)">at the end</option> <br/>
+                </select>
+            </div>
+
+            <div class="form-group">
+
+                <label for="mode">Select Language</label>
+                <select id="mode" class="form-control" onchange="updateLanguage ( )">
+                    <option value="java" selected>Java</option>
+                    <option value="javascript" >Javascript</option>
+                    <option value="haskell" >Haskell</option>
+                </select>
+
+                <textarea name="content" id="inputCode" hidden></textarea>
+
+                @if(content.getType == 2){
+                    @Html(content.getContent)
+
+                    <script>
+                    function updateLanguage(){
+                        var e = document.getElementById("mode");
+                        var strUser = e.options[e.selectedIndex].value;
+
+                        var editor = ace.edit('@try {content.getContent.substring( content.getContent.indexOf("id=")+4, content.getContent.indexOf("\"", content.getContent.indexOf("id=")+4) ) }catch{case _: Throwable =>}');
+                        editor.getSession().setMode('ace/mode/'+strUser);
+                    }
+                    </script>
+                    <script>
+                        //get the editor
+                        var editor = ace.edit('@try {content.getContent.substring( content.getContent.indexOf("id=")+4, content.getContent.indexOf("\"", content.getContent.indexOf("id=")+4) ) }catch{case _: Throwable =>}');
+
+                        //Set read only and set the height
+                        editor.setReadOnly(false);
+                        document.getElementById('@try {content.getContent.substring( content.getContent.indexOf("id=")+4, content.getContent.indexOf("\"", content.getContent.indexOf("id=")+4) ) }catch{case _: Throwable =>}').setAttribute("style", 'height: '+ (editor.session.getLength()*14+2) + 'px' );
+
+                        //Set the language in the "Select language" selection
+                        var languagePath = editor.getSession().getMode().$id
+                        var language = languagePath.substring(languagePath.indexOf('/', 6)+1);
+                        document.getElementById("mode").value = language;
+                    </script>
+
+
+                    <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode('@try {content.getContent.substring( content.getContent.indexOf("id=")+4, content.getContent.indexOf("\"", content.getContent.indexOf("id=")+4) ) }catch{case _: Throwable =>}')">
+                    <a href="@routes.FlashCardControllerSensei.flashCardPage(flashcard.getFlashCardID, true)" class="btn btn-default">Cancel</a>
+
+
+                    <!-- ID of Editor @try {content.getContent.substring( content.getContent.indexOf("id=")+4, content.getContent.indexOf("\"", content.getContent.indexOf("id=")+4) ) }catch{case _: Throwable => "no ID"}   -->
+
+
+                }else{
+
+                    <!-- Create new Code-Editor -->
+                    <div id="editor" class="editor"></div>
+                    <script>
+                        var editor = ace.edit("editor");
+                        editor.setTheme("ace/theme/chrome");
+                        var e = document.getElementById("mode");
+                        var strUser = e.options[e.selectedIndex].value;
+                        var language = strUser.valueOf();
+                        editor.getSession().setMode("ace/mode/"+language);
+                    </script>
+                    <script>
+                    function updateLanguage(){
+                        var e = document.getElementById("mode");
+                        var strUser = e.options[e.selectedIndex].value;
+
+                        var editor = ace.edit("editor");
+                        editor.getSession().setMode('ace/mode/'+strUser);
+                    }
+                    </script>
+
+
+                    <input type="submit" value="Ok" class="btn btn-primary" onclick="setCode('editor')">
+                    <a href="@routes.FlashCardControllerSensei.flashCardPage(flashcard.getFlashCardID, true)" class="btn btn-default">Cancel</a>
+                }
+            </div>
+        </form>
+
+    </div>
+
+    <!-- Script to select the right radio button when page loads -->
+    <script>
+        var contentID = '@content.getType';
+
+        if(contentID==1) {
+
+            document.getElementById('inlineRadio2').setAttribute("checked", "checked");
+
+            document.getElementById('inputText').innerHTML = '';
+
+            document.getElementById('contentText').setAttribute("hidden", "hidden");
+            document.getElementById('contentImage').removeAttribute("hidden");
+            document.getElementById('contentCode').setAttribute("hidden", "hidden");
+
+        } else {
+            if(contentID==2) {
+                document.getElementById('inlineRadio3').setAttribute("checked", "checked");
+
+                document.getElementById('inputText').innerHTML = '';
+
+                document.getElementById('contentText').setAttribute("hidden", "hidden");
+                document.getElementById('contentImage').setAttribute("hidden", "hidden");
+                document.getElementById('contentCode').removeAttribute("hidden");
+            } else {
+                document.getElementById('inlineRadio1').setAttribute("checked", "checked");
+                document.getElementById('contentText').removeAttribute("hidden");
+                document.getElementById('contentImage').setAttribute("hidden", "hidden");
+                document.getElementById('contentCode').setAttribute("hidden", "hidden");
+            }
+        }
+    </script>
+
+
+    <script>
+        function changed(rb) {
+            var clicked = rb.value;
+            if(clicked == 'text'){
+                document.getElementById('contentText').removeAttribute("hidden");
+                document.getElementById('contentImage').setAttribute("hidden", "hidden");
+                document.getElementById('contentCode').setAttribute("hidden", "hidden");
+            }
+            if(clicked == 'image'){
+                document.getElementById('contentText').setAttribute("hidden", "hidden");
+                document.getElementById('contentImage').removeAttribute("hidden");
+                document.getElementById('contentCode').setAttribute("hidden", "hidden")
+            }
+            if(clicked == 'code'){
+                document.getElementById('contentText').setAttribute("hidden", "hidden");
+                document.getElementById('contentImage').setAttribute("hidden", "hidden");
+                document.getElementById('contentCode').removeAttribute("hidden");
+            }
+        }
+    </script>
+    <!-- 2 times same script because firefox and chrome handle unload differently-->
+    <script>
+        window.onbeforeunload = function () {
+            var kanton= "/token/delete/"+ @content.getContentID;
+            var xmlhttp= new XMLHttpRequest();
+            xmlhttp.open("GET", kanton, true);
+            xmlhttp.send();
+        }
+    </script>
+    <script>
+        window.onunload = function () {
+        var kanton= "/token/delete/"+ @content.getContentID;
+        var xmlhttp= new XMLHttpRequest();
+        xmlhttp.open("GET", kanton, true);
+        xmlhttp.send();
+        }
+    </script>
+    <!-- end of both scripts-->
+
+    <!-- Controlls the file types for uploaded files -->
+    <script>
+        var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+        function Validate(oForm) {
+        var arrInputs = oForm.getElementsByTagName("input");
+        for (var i = 0; i < arrInputs.length; i++) {
+            var oInput = arrInputs[i];
+            if (oInput.type == "file") {
+                var sFileName = oInput.value;
+                if (sFileName.length > 0) {
+                    var blnValid = false;
+                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                        var sCurExtension = _validFileExtensions[j];
+                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                            blnValid = true;
+                            break;
+                        }
+                    }
+
+                    if (!blnValid) {
+                        var warn = document.getElementById('warning');
+                        warn.className = 'label label-danger';
+                        warn.innerHTML = 'Sorry, not allowed. Allowed extensions are: ' + _validFileExtensions.join(", ");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+    </script>
+
+
+    <!-- Generates the code for DB -->
+    <script>
+        function setCode(idOfEditor){
+
+            var editor = ace.edit(idOfEditor);
+            editor.session.setNewLineMode("windows");
+
+            var content = editor.getSession().getValue();
+            var random = Math.random().toString(36).substring(7);
+
+            var e = document.getElementById("mode");
+            var language = e.options[e.selectedIndex].value;
+
+
+            var mainDiv = document.createElement('div');
+            mainDiv.setAttribute("id", "editor"+random);
+            mainDiv.setAttribute("class", "editor");
+            mainDiv.setAttribute("style", 'height: '+ (editor.session.getLength()*14+2) + 'px' );
+            mainDiv.innerHTML = content+"";
+
+            var s = document.createElement('script');
+            s.type = 'text/javascript';
+            var code = 'var editor = ace.edit("editor' + random + '"); ' +
+                  'editor.setTheme("ace/theme/chrome"); ' +
+                  'editor.getSession().setMode("ace/mode/'+language+'"); ' +
+                  'editor.resize(); ' +
+                  'editor.setReadOnly(true); ' +
+                  'editor.session.setNewLineMode("windows");';
+            try {
+                s.appendChild(document.createTextNode(code));
+                document.body.appendChild(s);
+            } catch (e) {
+                s.text = code;
+                document.body.appendChild(s);
+            }
+
+            var outherDiv = document.createElement('div');
+            outherDiv.appendChild(mainDiv);
+            outherDiv.appendChild(s);
+
+            document.getElementById('inputCode').value = outherDiv.innerHTML;
+
+        };
+    </script>
+}
+
+

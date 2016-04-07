@@ -1,0 +1,34 @@
+@(references: java.util.HashMap[Integer, java.util.List[models.Reference]])(content: models.Content)(docID: Integer)(chapters: java.util.List[ChapterChan])(headlines: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlines: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])(contentToChapters: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(contentToSubHeadlines: java.util.HashMap[Integer, java.util.List[models.Content]])(toEdit: Boolean)
+
+
+<div class="reference hidden-print">
+
+    @for(reference: models.Reference <- references.getOrDefault(content.getContentID, new java.util.LinkedList[models.Reference])){
+        @if(toEdit){
+            <small>
+                <span data-toggle="tooltip" data-placement="top" title="Delete Reference">
+                    <a href="@routes.ContentController.deleteReference(reference.getId, docID)">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </a>
+                </span>
+            </small>
+        }
+        <a href="http://localhost:9000/documents/@reference.getReferencesToDocID#content@reference.getReferencesToID" class="btn-distance"> <small> @reference.getName </small> </a>
+    }
+
+
+    @if(toEdit) {
+
+        <!-- Add Reference -->
+        <small>
+            <span data-toggle="tooltip" data-placement="top" title="Add Reference">
+                <a data-toggle="modal" data-target="#addReference@content.getContentID" class="btn-distance cursorPointer">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><a href="@routes.ContentController.addReferencePage(content.getContentID, docID)">add Reference</a>
+                </a>
+            </span>
+        </small>
+    }
+
+</div>
+
+

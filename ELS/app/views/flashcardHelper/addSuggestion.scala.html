@@ -1,0 +1,92 @@
+@(content: models.Content)(chaptersDoc: java.util.List[ChapterChan])(headlinesDoc: java.util.HashMap[Integer, java.util.List[ContentHeadline]])(subHeadlinesDoc: java.util.HashMap[Integer, java.util.List[ContentSubHeadline]])
+
+
+<a data-toggle="modal" href="#suggest@content.getContentID" aria-expanded="false" aria-controls="collapseExample">
+    <span class="glyphicon glyphicon-plus"></span> Suggest
+</a>
+
+
+
+<!-- Modal - Add Suggestion -->
+<div class="modal fade" id="suggest@content.getContentID" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" >Suggest Content</h4>
+            </div>
+            <form method="POST" id="suggestForm@content.getContentID"  >
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="referencesTo">  Select the place where the new content should be suggested to. </label>
+                        <select class="form-control" id="parentOfSuggestionID@content.getContentID">
+                        @for(chapter: models.ChapterChan <- chaptersDoc){
+                            <option value="c@chapter.getChapterID"> @chapter.getTitle </option>
+                            @for(headline: models.ContentHeadline <- headlinesDoc.get(chapter.getChapterID)) {
+                                <option value="h@headline.getcHeadLineID"> @chapter.getTitle : @headline.getTitle </option>
+                                @for(subHeadline: models.ContentSubHeadline <- subHeadlinesDoc.get(headline.getcHeadLineID())) {
+                                    <option value="s@subHeadline.getcSubHeadLineID"> @chapter.getTitle : @headline.getTitle : @subHeadline.getTitle </option>
+                                }
+                            }
+                        }
+                        </select>
+                    </div>
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" type="submit" value="Ok" onmouseover="setValues@(content.getContentID)();">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    function setValues@(content.getContentID)() {
+
+        var parentSuggestion = document.getElementById('parentOfSuggestionID@content.getContentID');
+        var parentSuggestionValue = parentSuggestion.options[parentSuggestion.selectedIndex].value;
+
+        var kind = parentSuggestionValue.substring(0,1);
+        var parentID = parentSuggestionValue.substring(1);
+        //alert('kind: '+kind+'    idParent: '+parentID);
+        if(kind == 'c'){
+
+            var form = document.getElementById('suggestForm@content.getContentID');
+            form.setAttribute('action', ('/suggestContent/@content.getContentID/0/'+parentID) );
+
+        }
+        if(kind == 'h'){
+
+            var form = document.getElementById('suggestForm@content.getContentID');
+            form.setAttribute('action', ('/suggestContent/@content.getContentID/1/'+parentID) );
+
+        }
+        if(kind == 's'){
+            var form = document.getElementById('suggestForm@content.getContentID');
+            form.setAttribute('action', ('/suggestContent/@content.getContentID/2/'+parentID) );
+        }
+
+
+    }
+
+
+
+
+   </script>
